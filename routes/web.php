@@ -22,7 +22,8 @@ Route::middleware([
     route::get('/course/{curriculum}/edit',[ProgramController::class,'editcourse'])->name('course.edit'); 
     route::put('/course/{curriculum}/update',[ProgramController::class,'updatecourse'])->name('updatecourse');    
 
-
+// add prereq
+    route::post('/addprereq',[ProgramController::class,'addprereq'])->name('addprereq');
   
     Route::get('/students',[StudentController::class,'index'])->name('students');
     route::post('/addstudents',[StudentController::class,'addstudents'])->name('addstudents');

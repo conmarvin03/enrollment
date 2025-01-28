@@ -11,14 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('grades', function (Blueprint $table) {
-            $table->integer('id');
-            $table->integer('uID');
-            $table->integer('yID');
-            $table->integer('tID');
-            $table->float('grades');
-            $table->timestamps();
-        });
+        // Schema::table('grades', function (Blueprint $table) {
+        //     $table->integer('id');
+        //     $table->integer('uID');
+        //     $table->integer('yID');
+        //     $table->integer('tID');
+        //     $table->float('grades');
+        //     $table->timestamps();
+        // });
     }
 
     /**

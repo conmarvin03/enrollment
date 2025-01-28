@@ -59,6 +59,9 @@
                             
                         </form>
                         <div class="p-3">
+                            <form action="{{route('addprereq')}}" method="post">
+                                @csrf
+                                    @method('post')
                             <div class="row">
                                 <div class="col">
                             <p class="h5 mt-2">Prerequisite</p>
@@ -67,29 +70,35 @@
                             <div class="col">
                                 <button type="submit" class="btn btn-outline-success" style="float: right;"><i class="fa-solid fa-plus"></i> Add Prerequisite</button>
                            
+                         
                             </div>
                             </div>
+                            
                             <div class="row">
-                            <div class="col">
-                            <select name="coursid" required class="form-control w-100 form-control-broder border-secondary mt-2">
+                             
+                                  <div class="col">
+                            <select name="coursecode" required class="form-control w-100 form-control-broder border-secondary mt-2">
                                 <option value="">Select Course Code</option>
                                 @foreach ($curriculum as $asd)
                                
-                                    <option  value="{{$asd->courseCode}}">{{$asd->courseCode.'-'.$asd->course}}</option>
+                                    <option  value="{{$asd->id}}">{{$asd->courseCode.'-'.$asd->course}}</option>
                                         @endforeach   
                             </select>
                             </div>
                             <div class="col">
-                            <select name="prereqid" required class="form-control w-100 form-control-broder border-secondary mt-2">
+                            <select name="prereq" required class="form-control w-100 form-control-broder border-secondary mt-2">
                                 <option value="">Select Prerequisite Code</option>
                                 @foreach ($curriculum as $asd)
                                
-                                    <option  value="{{$asd->courseCode}}">{{$asd->courseCode.'-'.$asd->course}}</option>
+                                    <option  value="{{$asd->id}}">{{$asd->courseCode.'-'.$asd->course}}</option>
                                         @endforeach   
                             </select>
+                        
                             </div>
                          </div>
+                        </form>
                         </div>
+                        
                     </div>
                     <div class="col-7">
                     

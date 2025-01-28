@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 use App\Models\Programs;
 use App\Models\Curriculums;
+use App\Models\Prereqs;
 use Illuminate\Http\Request;
 use Exception;
 
@@ -28,6 +29,49 @@ class ProgramController extends Controller
             'status'=>'']);
            
             return redirect(route('programs'))->with('success', 'Program Added Successfully!');
+        } catch (Exception $e) {
+              return response()->json(['error' => 'Error updating status'], 500);
+        }
+    
+    }
+    public function addprereq(Request $request)
+    {
+        try{
+            $data=$request->validate([
+                'coursecode'=>'required',
+                'prereq'=> 'required'
+              
+              
+            ]);
+
+            $yearcc = Curriculums::where('id', $request->coursecode)->value('years'); // Replace 'column_name' with your desired column
+            $yearpr = Curriculums::where('id', $request->prereq)->value('years'); // Replace 'column_name' with your desired column
+            $semcc = Curriculums::where('id', $request->coursecode)->value('semester'); // Replace 'column_name' with your desired column
+            $sempr = Curriculums::where('id', $request->prereq)->value('semester'); // Replace 'column_name' with your desired column
+          
+            if($request->coursecode==$request->prereq)
+            {
+                return redirect(route('programs'))->with('error', 'Prerequisite and course code cant be equal!!!');
+            }
+            else if($yearcc>$yearpr){
+                return redirect(route('programs'))->with('error', 'Prerequisite must be in higher year/sem than course code!!!!');
+         
+            }else if($yearcc==$yearpr&&$semcc>$sempr)
+            {
+                return redirect(route('programs'))->with('error', 'Prerequisite must be in higher year/sem than course code!!!!');
+         
+            
+            }else{
+
+
+
+            $newProduct=Prereqs::create([
+            'courseCode'=>$request->coursecode,
+            'preReq'=>$request->prereq,
+            ]);
+           
+            return redirect(route('programs'))->with('success', 'Prerequisite Added Successfully!');
+        }
         } catch (Exception $e) {
               return response()->json(['error' => 'Error updating status'], 500);
         }
