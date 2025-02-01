@@ -94,6 +94,7 @@
                                         @endforeach   
                             </select>
                         
+                            <input type="text" value="{{$asd->pID}}" name="zxc" style="display: none;">
                             </div>
                          </div>
                         </form>
@@ -194,44 +195,79 @@
                     </div>
          
                       </div>
+                      <nav>
+                        <div class="nav nav-tabs" id="nav-tab" role="tablist">
+                          <button class="nav-link active" id="nav-home-tab" data-bs-toggle="tab" data-bs-target="#nav-home" type="button" role="tab" aria-controls="nav-home" aria-selected="true">Courses</button>
+                          <button class="nav-link" id="nav-profile-tab" data-bs-toggle="tab" data-bs-target="#nav-profile" type="button" role="tab" aria-controls="nav-profile" aria-selected="false">Prerequisite</button>
+                        </div>
+                      </nav>
+                      <div class="tab-content" id="nav-tabContent">
+                        <div class="tab-pane fade show active" id="nav-home" role="tabpanel" aria-labelledby="nav-home-tab">
+                            <div class="container">
+                            <table  id="example"  class="table-responsive text-center display table table-striped table-hover table-bordered border-success" >
+                                <thead class="text-center">
+                                 <tr>
+                                    <th class="text-center">ID</th>
+                                    <th class="text-center" width="5">Course Code</th>
+                                    <th class="text-center">Course</th>
+                                    <th class="text-center">Lec/Lab</th>
+                                    <th class="text-center">Type</th>
+                                    <th class="text-center">Unit/s</th>
+                                    <th class="text-center">Year</th>
+                                    <th class="text-center">Semester</th>
+                                    <th class="text-center">Action</th>
+                                 </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach ($curriculum as $curriculum)
+                                    <tr>
+                                        <td class="text-center" >{{$curriculum->id}}</td>
+                                        <td class="text-center" >{{$curriculum->courseCode}}</td>
+                                        <td class="text-center" >{{$curriculum->course}}</td>
+                                        <td class="text-center" >{{$curriculum->leclab}}</td>
+                                        <td class="text-center" >{{$curriculum->type}}</td>
+                                        <td class="text-center" >{{$curriculum->unit}}</td>
+                                        <td class="text-center" >{{$curriculum->years}}</td>
+                                        <td class="text-center" >{{$curriculum->semester}}</td>
+                                        <td><a class="navbar-brand text-dark btn btn-outline-secondary" href="{{route('course.edit',['curriculum'=> $curriculum])}}"><i class="fa-regular fa-pen-to-square"></i> Edit</a>
+                                        </td>
+                    
+                                    </tr>
+                                 
+                                                    
+                                  
+                                        @endforeach     
+                                </tbody>
+                    
+                            </table>  
+                            </div>
+                        </div>
+                        <div class="tab-pane fade" id="nav-profile" role="tabpanel" aria-labelledby="nav-profile-tab">  <table  id="example"  class="table-responsive text-center display table table-striped table-hover table-bordered border-success" >
+                            <thead class="text-center">
+                             <tr>
+                                <th class="text-center">ID</th>
+                                <th class="text-center">Course Code</th>
+                         
+                             </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($pp as $pp)
+                                <tr>
+                                    <td class="text-center" >{{$pp->course}}</td>
+                                    <td class="text-center" >{{$pp->course}}</td>
+                                           
+                                </tr>
+                             
+                                                
+                              
+                                    @endforeach     
+                            </tbody>
+                
+                        </table>  </div>
+                        <div class="tab-pane fade" id="nav-contact" role="tabpanel" aria-labelledby="nav-contact-tab">...</div>
+                      </div>
                   
                    
-        <table  id="example"  class="table-responsive text-center display table table-striped table-hover table-bordered border-success" >
-            <thead class="text-center">
-             <tr>
-                <th class="text-center">ID</th>
-                <th class="text-center" width="5">Course Code</th>
-                <th class="text-center">Course</th>
-                <th class="text-center">Lec/Lab</th>
-                <th class="text-center">Type</th>
-                <th class="text-center">Unit/s</th>
-                <th class="text-center">Year</th>
-                <th class="text-center">Semester</th>
-                <th class="text-center">Action</th>
-             </tr>
-            </thead>
-            <tbody>
-                @foreach ($curriculum as $curriculum)
-                <tr>
-                    <td class="text-center" >{{$curriculum->id}}</td>
-                    <td class="text-center" >{{$curriculum->courseCode}}</td>
-                    <td class="text-center" >{{$curriculum->course}}</td>
-                    <td class="text-center" >{{$curriculum->leclab}}</td>
-                    <td class="text-center" >{{$curriculum->type}}</td>
-                    <td class="text-center" >{{$curriculum->unit}}</td>
-                    <td class="text-center" >{{$curriculum->years}}</td>
-                    <td class="text-center" >{{$curriculum->semester}}</td>
-                    <td><a class="navbar-brand text-dark btn btn-outline-secondary" href="{{route('course.edit',['curriculum'=> $curriculum])}}"><i class="fa-regular fa-pen-to-square"></i> Edit</a>
-                    </td>
-
-                </tr>
-             
-                                
-              
-                    @endforeach     
-            </tbody>
-
-        </table>  
                 </div>
 
             </div>

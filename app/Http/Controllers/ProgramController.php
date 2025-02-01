@@ -39,8 +39,8 @@ class ProgramController extends Controller
         try{
             $data=$request->validate([
                 'coursecode'=>'required',
-                'prereq'=> 'required'
-              
+                'prereq'=> 'required',
+              'zxc'=>'required'
               
             ]);
 
@@ -68,10 +68,12 @@ class ProgramController extends Controller
             $newProduct=Prereqs::create([
             'courseCode'=>$request->coursecode,
             'preReq'=>$request->prereq,
+        'pID'=>$request->zxc,
+            'status'=>''
             ]);
            
-            return redirect(route('programs'))->with('success', 'Prerequisite Added Successfully!');
-        }
+        
+        return back()->with('success', 'Prerequisite Added Successfully!');  }
         } catch (Exception $e) {
               return response()->json(['error' => 'Error updating status'], 500);
         }
@@ -85,10 +87,14 @@ class ProgramController extends Controller
         $countlaboratory=Curriculums::where('pID','=',$program->id)->where('leclab','=','Laboratory')->count();
         $countlaboratory=Curriculums::where('pID','=',$program->id)->where('leclab','=','Laboratory')->count();
         $sumUnits=Curriculums::where('pID','=',$program->id)->sum('Unit');
-     
+        $pp=DB::table('prerequisites as p')
+        ->join('courses as c1', 'p.course_id', '=', 'c1.course_id')
+        ->join('courses as c2', 'p.prerequisite_id', '=', 'c2.course_id')
+        ->select('p.course_id', 'c1.course_name as course_name', 'p.prerequisite_id', 'c2.course_name as prerequisite_name')
+        ->get();
         $curriculum=Curriculums::where('pID','=',$program->id)->get();
         return view('curriculum',['program'=>$program,'curriculum'=>$curriculum,'countlecture'=>$countlecture,'countlaboratory'=>$countlaboratory,
-        'sumUnits'=>$sumUnits,'noofcourses'=>$noofcourses]);
+        'sumUnits'=>$sumUnits,'noofcourses'=>$noofcourses,'pp'=>$pp]);
     }
     public function updateprogram(Programs $program ,Request $request)
     {
