@@ -117,7 +117,6 @@
                         </form>
  
                   </div>
-                  asd
                 </div>
         </div>
     </div>

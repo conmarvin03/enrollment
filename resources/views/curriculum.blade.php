@@ -1,6 +1,7 @@
 <head>
     <title>Enrollment- Programs</title>
   </head>
+
 <x-app-layout>
     <x-slot name="header">
         @if (session('success'))
@@ -26,7 +27,7 @@
         </script>
     @endif
     <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+        <div class="max-w-12xl mx-auto sm:px-6 lg:px-8">
            
                 <div class="card card-success">
                     <div class="card card-success">
@@ -58,48 +59,40 @@
                                     <input type="text" class="form-control w-100 border-secondary mt-2" name="program" required value="{{$program->program}}" placeholder="Enter Course Title">
                             
                         </form>
-                        <div class="p-3">
+               
+                        <div class="p-3"> <p class="h5">Add Prerequisite</p>
+                            <hr>
+                           
+                            <div class="row">
+                                <div class="col">
                             <form action="{{route('addprereq')}}" method="post">
                                 @csrf
                                     @method('post')
-                            <div class="row">
-                                <div class="col">
-                            <p class="h5 mt-2">Prerequisite</p>
-<hr>
-                                </div>
-                            <div class="col">
-                                <button type="submit" class="btn btn-outline-success" style="float: right;"><i class="fa-solid fa-plus"></i> Add Prerequisite</button>
-                           
-                         
-                            </div>
-                            </div>
+                                    <select name="coursecode" required class="form-control w-100 form-control-broder border-secondary mt-2">
+                                        <option value="">Select Course Code</option>
+                                        @foreach ($curriculum as $asd)
+                                       
+                                            <option  value="{{$asd->id}}">{{$asd->courseCode.'-'.$asd->course}}</option>
+                                                @endforeach   
+                                    </select>
+                                    </div>
+                                    <div class="col">
+                                    <select name="prereq" required class="form-control w-100 form-control-broder border-secondary mt-2">
+                                        <option value="">Select Prerequisite Code</option>
+                                        @foreach ($curriculum as $asd)
+                                       
+                                            <option  value="{{$asd->id}}">{{$asd->courseCode.'-'.$asd->course}}</option>
+                                                @endforeach   
+                                    </select>
+                                
+                                    <input type="text" value="{{$asd->pID}}" name="zxc" style="display: none;">
+                                    </div><div class="col">
+                                        <button type="submit" class="btn btn-outline-success  mt-2" style="float: right;"><i class="fa-solid fa-plus"></i> Add Prerequisite</button>
+                                   
+                                    </div></div>
+                            </form>
                             
-                            <div class="row">
-                             
-                                  <div class="col">
-                            <select name="coursecode" required class="form-control w-100 form-control-broder border-secondary mt-2">
-                                <option value="">Select Course Code</option>
-                                @foreach ($curriculum as $asd)
-                               
-                                    <option  value="{{$asd->id}}">{{$asd->courseCode.'-'.$asd->course}}</option>
-                                        @endforeach   
-                            </select>
-                            </div>
-                            <div class="col">
-                            <select name="prereq" required class="form-control w-100 form-control-broder border-secondary mt-2">
-                                <option value="">Select Prerequisite Code</option>
-                                @foreach ($curriculum as $asd)
-                               
-                                    <option  value="{{$asd->id}}">{{$asd->courseCode.'-'.$asd->course}}</option>
-                                        @endforeach   
-                            </select>
-                        
-                            <input type="text" value="{{$asd->pID}}" name="zxc" style="display: none;">
-                            </div>
-                         </div>
-                        </form>
-                        </div>
-                        
+                    </div>
                     </div>
                     <div class="col-7">
                     
@@ -203,7 +196,7 @@
                       </nav>
                       <div class="tab-content" id="nav-tabContent">
                         <div class="tab-pane fade show active" id="nav-home" role="tabpanel" aria-labelledby="nav-home-tab">
-                            <div class="container">
+                            <div>
                             <table  id="example"  class="table-responsive text-center display table table-striped table-hover table-bordered border-success" >
                                 <thead class="text-center">
                                  <tr>
@@ -242,20 +235,21 @@
                             </table>  
                             </div>
                         </div>
-                        <div class="tab-pane fade" id="nav-profile" role="tabpanel" aria-labelledby="nav-profile-tab">  <table  id="example"  class="table-responsive text-center display table table-striped table-hover table-bordered border-success" >
+                        <div class="tab-pane fade" id="nav-profile" role="tabpanel" aria-labelledby="nav-profile-tab">  <table  id="example"  class="table-responsive text-center display table table-striped table-hover table-bordered border-success w-50" >
                             <thead class="text-center">
                              <tr>
                                 <th class="text-center">ID</th>
                                 <th class="text-center">Course Code</th>
+                                <th class="text-center">Action</th>
                          
                              </tr>
                             </thead>
                             <tbody>
                                 @foreach ($pp as $pp)
                                 <tr>
-                                    <td class="text-center" >{{$pp->course}}</td>
-                                    <td class="text-center" >{{$pp->course}}</td>
-                                           
+                                    <td class="text-left" >{{$pp->course.' - '.$pp->course1}}</td>
+                                    <td class="text-left" >{{$pp->prerequisite.' - '.$pp->prerequisite1}}</td>
+                                    <td></td>       
                                 </tr>
                              
                                                 

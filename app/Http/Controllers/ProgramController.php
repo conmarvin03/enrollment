@@ -6,7 +6,7 @@ use App\Models\Curriculums;
 use App\Models\Prereqs;
 use Illuminate\Http\Request;
 use Exception;
-
+use Illuminate\Support\Facades\DB;
 class ProgramController extends Controller
 {
     public function index()
@@ -51,14 +51,14 @@ class ProgramController extends Controller
           
             if($request->coursecode==$request->prereq)
             {
-                return redirect(route('programs'))->with('error', 'Prerequisite and course code cant be equal!!!');
+                return back()->with('error', 'Prerequisite and course code cant be equal!!!');
             }
             else if($yearcc>$yearpr){
-                return redirect(route('programs'))->with('error', 'Prerequisite must be in higher year/sem than course code!!!!');
+                return back()->with('error', 'Prerequisite must be in higher year/sem than course code!!!!');
          
             }else if($yearcc==$yearpr&&$semcc>$sempr)
             {
-                return redirect(route('programs'))->with('error', 'Prerequisite must be in higher year/sem than course code!!!!');
+                return back()->with('error', 'Prerequisite must be in higher year/sem than course code!!!!');
          
             
             }else{
@@ -87,14 +87,18 @@ class ProgramController extends Controller
         $countlaboratory=Curriculums::where('pID','=',$program->id)->where('leclab','=','Laboratory')->count();
         $countlaboratory=Curriculums::where('pID','=',$program->id)->where('leclab','=','Laboratory')->count();
         $sumUnits=Curriculums::where('pID','=',$program->id)->sum('Unit');
-        $pp=DB::table('prerequisites as p')
-        ->join('courses as c1', 'p.course_id', '=', 'c1.course_id')
-        ->join('courses as c2', 'p.prerequisite_id', '=', 'c2.course_id')
-        ->select('p.course_id', 'c1.course_name as course_name', 'p.prerequisite_id', 'c2.course_name as prerequisite_name')
+       
+
+        $pp=DB::table('prereqs as cp')
+        ->join('curriculums as c1', 'cp.courseCode', '=', 'c1.id')
+        ->join('curriculums as c2', 'cp.preReq', '=', 'c2.id')
+        ->select('cp.id', 'c1.courseCode as course', 'c1.course as course1','c2.courseCode as prerequisite','c2.course as prerequisite1')
+        ->where('cp.pID','=',$program->id)
         ->get();
+
         $curriculum=Curriculums::where('pID','=',$program->id)->get();
         return view('curriculum',['program'=>$program,'curriculum'=>$curriculum,'countlecture'=>$countlecture,'countlaboratory'=>$countlaboratory,
-        'sumUnits'=>$sumUnits,'noofcourses'=>$noofcourses,'pp'=>$pp]);
+        'sumUnits'=>$sumUnits,'noofcourses'=>$noofcourses,'pp'=> $pp]);
     }
     public function updateprogram(Programs $program ,Request $request)
     {
