@@ -93,7 +93,7 @@ class ProgramController extends Controller
         ->join('curriculums as c1', 'cp.courseCode', '=', 'c1.id')
         ->join('curriculums as c2', 'cp.preReq', '=', 'c2.id')
         ->select('cp.id', 'c1.courseCode as course', 'c1.course as course1','c2.courseCode as prerequisite','c2.course as prerequisite1')
-        ->where('cp.pID','=',$program->id)
+        ->where('cp.pID','=',$program->id)->where('cp.status','=','')
         ->get();
 
         $curriculum=Curriculums::where('pID','=',$program->id)->get();
@@ -110,13 +110,24 @@ class ProgramController extends Controller
         return response()->json(['error' => 'Error updating status'], 500);
   }
     }
-    
     public function editcourse(Curriculums $curriculum)
     {
         
         return view('editcourse',['curriculum'=>$curriculum]);
     
       
+    }
+    public function archiveprereq(Request $request)
+    {
+        
+        try{
+            DB::table('prereqs')
+            ->where('id', $request->prereqID)
+            ->update(['status' => "Archived"]);
+            return back()->with('success', 'Prerequisite Deleted Successfully!');
+        } catch (Exception $e) {
+            return response()->json(['error' => 'Error updating status'], 500);
+      }
     }
     public function updatecourse(Curriculums $curriculum, Request $request)
     {
