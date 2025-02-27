@@ -1,14 +1,7 @@
 <head>
     <title>Enrollment- Programs</title>
   </head>
-<style>
-    div.ex1 {
-  width: 1050px;
-  height: 400px;
-  overflow: scroll;
-}
 
-</style>
 <x-app-layout>
     <x-slot name="header">
         @if (session('success'))
@@ -39,7 +32,7 @@
                 <div class="card card-success">
                     <div class="card card-success">
                         <div class="card-header">
-                            <a href="{{route('programs')}}" style="float: right;" class="btn btn-secondary">go back</a>
+                            <a href="{{route('programs')}}" style="float: right;" class="btn btn-outline-primary">go back</a>
                         <h3 class="card-title"> <i class="fa-solid fa-user"></i>  &nbsp;&nbsp;{{$program->acc.'- '.$program->program}}</h3>
                         </div>
              
@@ -60,7 +53,7 @@
                                     <input type="text" class="form-control w-100 border-secondary mt-2" name="acc" required value="{{$program->acc}}" placeholder=" Course Code">
                                     </div>
                                     <div class="col">
-                                    <button type="submit" class="btn btn-primary w-100 mt-2" style="float: right;"><i class="fa-solid fa-plus"></i> Update</button>       
+                                    <button type="submit" class="btn btn-outline-success w-100 mt-2" style="float: right;"><i class="fa-solid fa-plus"></i> Update</button>       
                                     </div>
                                   </div>
                                     <input type="text" class="form-control w-100 border-secondary mt-2" name="program" required value="{{$program->program}}" placeholder="Enter Course Title">
@@ -69,146 +62,116 @@
                
                         <div class="p-3"> <p class="h5">Add Prerequisite</p>
                             <hr>
-                            <form action="{{route('addcurriculums')}}" method="post">
+                           
+                            <div class="row">
+                                <div class="col">
+                            <form action="{{route('addprereq')}}" method="post">
                                 @csrf
                                     @method('post')
-                                    <div class="row">
-                                        <div class="col-4">
-                                    <input type="text" class="form-control w-100 border-secondary mt-2" name="cc" required placeholder="Enter Course Code">
-                                        </div>
-                                        <div class="col-8">
-                                    <input type="text" class="form-control w-100 border-secondary mt-2" name="c" required placeholder="Enter Course Title">
-                                        </div>
-                                        </div>
-                                        <div class="row">
-                                            <div class="col-6">
-                                    <select name="type" required class="form-control w-100 border-secondary mt-2">
-                                        <option value="">Select Course Type</option>
-                                        <option >General Education</option>
-                                        <option>Core Course</option>
-                                        <option>Professional Course</option>
-                                        <option>Electives</option>
-                                        <option>Thesis</option>
-                                        <option>Practicum</option>
+                                    <select name="coursecode" required class="form-control w-100 form-control-broder border-secondary mt-2">
+                                        <option value="">Select Course Code</option>
+                                        @foreach ($curriculum as $asd)
+                                       
+                                            <option  value="{{$asd->id}}">{{$asd->courseCode.'-'.$asd->course}}</option>
+                                                @endforeach   
                                     </select>
-                                </div>
-                                <div class="col-6">
-                                    <input type="num" class="form-control w-100  border-secondary mt-2" name="unit" required placeholder="Enter Course Unit/s">
-                                 
-                                    
-                                </div></div>
-                                <div class="row">
-                                    <div class="col-6">
-                                        <select name="years" required class="form-control w-100 form-control-broder border-secondary mt-2">
-                                            <option value="">Select Year</option>
-                                            <option value="1">First year</option>
-                                            <option value="2">Second Year</option>
-                                            <option value="3">Third Year</option>
-                                            <option value="4">Fourth Year</option>
-                                            <option value="5">Fifth Year</option>
-                                        </select>   
-                                   
                                     </div>
-                                    <div class="col-6">
-                                        <select name="semester" required class="form-control w-100 form-control-broder border-secondary mt-2">
-                                            <option value="">Select Semester</option>
-                                            <option value="1">First</option>
-                                            <option value="2">Second</option>
-                                            <option value="3">Summer</option>
-            
-                                        </select>
-                                    
-                                    </div></div>
-                                    <div class="row">
-                                        <div class="col-8">
-                                    <select name="leclab" required class="form-control w-100 form-control-broder border-secondary mt-2">
-                                        <option value="">Lecture or Laboratory</option>
-                                        <option value="Lecture">Lecture</option>
-                                        <option value="Laboratory">Laboratory</option>
-        
+                                    <div class="col">
+                                    <select name="prereq" required class="form-control w-100 form-control-broder border-secondary mt-2">
+                                        <option value="">Select Prerequisite Code</option>
+                                        @foreach ($curriculum as $asd)
+                                       
+                                            <option  value="{{$asd->id}}">{{$asd->courseCode.'-'.$asd->course}}</option>
+                                                @endforeach   
                                     </select>
-                                        </div>
-                                        <div class="col-4">
-                                    <input type="text" value="{{$program->id}}" name="pID"  style="display:none;">
-                                    <button type="submit" class="btn btn-primary mt-2" style="float: right;"><i class="fa-solid fa-plus"></i> Add Course</button>
-                                    <br>
-                                    
-                                        </div></div>
-                                    </form>
+                                
+                                    <input type="text" value="{{$asd->pID}}" name="zxc" style="display: none;">
+                                    </div><div class="col">
+                                        <button type="submit" class="btn btn-outline-success  mt-2" style="float: right;"><i class="fa-solid fa-plus"></i> Add Prerequisite</button>
+                                   
+                                    </div></div>
+                            </form>
                             
                     </div>
                     </div>
                     <div class="col-7">
                     
-                        <p class="h5">Add Prerequisite</p>
+                        <p class="h5">Add Course</p>
                         <hr>
-                        <div class="row">
-                            <div class="col">
-                        <form action="{{route('addprereq')}}" method="post">
+                        
+                        <form action="{{route('addcurriculums')}}" method="post">
                             @csrf
                                 @method('post')
-                                <select name="coursecode" required class="form-control w-100 form-control-broder border-secondary mt-2">
-                                    <option value="">Select Course Code</option>
-                                    @foreach ($curriculum as $asd)
-                                   
-                                        <option  value="{{$asd->id}}">{{$asd->courseCode.'-'.$asd->course}}</option>
-                                            @endforeach   
-                                </select>
-                                </div>
-                                <div class="col">
-                                <select name="prereq" required class="form-control w-100 form-control-broder border-secondary mt-2">
-                                    <option value="">Select Prerequisite Code</option>
-                                    @foreach ($curriculum as $asd)
-                                   
-                                        <option  value="{{$asd->id}}">{{$asd->courseCode.'-'.$asd->course}}</option>
-                                            @endforeach   
-                                </select>
-                            
-                                <input type="text" value="{{$asd->pID}}" name="zxc" style="display: none;">
-                                </div><div class="col">
-                                    <button type="submit" class="btn btn-primary  mt-2" style="float: right;"><i class="fa-solid fa-plus"></i> Add Prerequisite</button>
-                               
-                                </div></div>
-                        </form>
-                       
+                            <div class="card-body">
+                                <p class=" pt-2"> </p>
                                 
                             <div class="form-group">
-                                
-                              
-                   
+                                <div class="row">
+                                <div class="col-4">
+                            <input type="text" class="form-control w-100 border-secondary mt-2" name="cc" required placeholder="Enter Course Code">
+                                </div>
+                                <div class="col-8">
+                            <input type="text" class="form-control w-100 border-secondary mt-2" name="c" required placeholder="Enter Course Title">
+                                </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-6">
+                            <select name="type" required class="form-control w-100 border-secondary mt-2">
+                                <option value="">Select Course Type</option>
+                                <option >General Education</option>
+                                <option>Core Course</option>
+                                <option>Professional Course</option>
+                                <option>Electives</option>
+                                <option>Thesis</option>
+                                <option>Practicum</option>
+                            </select>
                         </div>
-                        <div class="ex1">
-                        <table  id="example2"  class="table-responsive text-center display table table-striped table-hover table-bordered" >
-                            <thead class="text-center">
-                             <tr>
-                                <th class="text-center">ID</th>
-                                <th class="text-center">Course Code</th>
-                                <th class="text-center">Action</th>
+                        <div class="col-6">
+                            <input type="num" class="form-control w-100  border-secondary mt-2" name="unit" required placeholder="Enter Course Unit/s">
                          
-                             </tr>
-                            </thead>
-                            <tbody>
-                                @foreach ($pp as $pp)
-                                <tr>
-                                    <form action="{{route('archiveprereq')}}" method="post">
-                                        @csrf
-                                            @method('put')
-                                    <td class="text-left" >
-                                        <input type="text" value="{{$pp->id}}" name="prereqID" style="display: none;">{{$pp->course.' - '.$pp->course1}}</td>
-                                    <td class="text-left" >{{$pp->prerequisite.' - '.$pp->prerequisite1}}</td>
-                                    <td>  <button type="submit" class="btn btn-danger mt-2" ><i class="fa-solid fa-times"></i></button>       
-                                    
-                                    </td>   
-                                    </form>    
-                                </tr>
-                             
-                                                
-                              
-                                    @endforeach     
-                            </tbody>
-                
-                        </table> 
+                            
+                        </div></div>
+                        <div class="row">
+                            <div class="col-6">
+                                <select name="years" required class="form-control w-100 form-control-broder border-secondary mt-2">
+                                    <option value="">Select Year</option>
+                                    <option value="1">First year</option>
+                                    <option value="2">Second Year</option>
+                                    <option value="3">Third Year</option>
+                                    <option value="4">Fourth Year</option>
+                                    <option value="5">Fifth Year</option>
+                                </select>   
+                           
+                            </div>
+                            <div class="col-6">
+                                <select name="semester" required class="form-control w-100 form-control-broder border-secondary mt-2">
+                                    <option value="">Select Semester</option>
+                                    <option value="1">First</option>
+                                    <option value="2">Second</option>
+                                    <option value="3">Summer</option>
+    
+                                </select>
+                            
+                            </div></div>
+                            <div class="row">
+                                <div class="col-8">
+                            <select name="leclab" required class="form-control w-100 form-control-broder border-secondary mt-2">
+                                <option value="">Lecture or Laboratory</option>
+                                <option value="Lecture">Lecture</option>
+                                <option value="Laboratory">Laboratory</option>
+
+                            </select>
+                                </div>
+                                <div class="col-4">
+                            <input type="text" value="{{$program->id}}" name="pID"  style="display:none;">
+                            <button type="submit" class="btn btn-outline-success mt-2" style="float: right;"><i class="fa-solid fa-plus"></i> Add Course</button>
+                            <br>
+                            
+                                </div></div>
+                            </form>
                         </div>
+                  
+                    
                     </div>
                   </div>
            
@@ -225,9 +188,15 @@
                     </div>
          
                       </div>
-                    
+                      <nav>
+                        <div class="nav nav-tabs" id="nav-tab" role="tablist">
+                          <button class="nav-link active" id="nav-home-tab" data-bs-toggle="tab" data-bs-target="#nav-home" type="button" role="tab" aria-controls="nav-home" aria-selected="true">Courses</button>
+                          <button class="nav-link" id="nav-profile-tab" data-bs-toggle="tab" data-bs-target="#nav-profile" type="button" role="tab" aria-controls="nav-profile" aria-selected="false">Prerequisite</button>
+                        </div>
+                      </nav>
                       <div class="tab-content" id="nav-tabContent">
-                          <div>
+                        <div class="tab-pane fade show active" id="nav-home" role="tabpanel" aria-labelledby="nav-home-tab">
+                            <div>
                             <table  id="example"  class="table-responsive text-center display table table-striped table-hover table-bordered border-success" >
                                 <thead class="text-center">
                                  <tr>
@@ -265,8 +234,32 @@
                     
                             </table>  
                             </div>
+                        </div>
+                        <div class="tab-pane fade" id="nav-profile" role="tabpanel" aria-labelledby="nav-profile-tab">  <table  id="example"  class="table-responsive text-center display table table-striped table-hover table-bordered border-success w-50" >
+                            <thead class="text-center">
+                             <tr>
+                                <th class="text-center">ID</th>
+                                <th class="text-center">Course Code</th>
+                                <th class="text-center">Action</th>
+                         
+                             </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($pp as $pp)
+                                <tr>
+                                    <td class="text-left" >{{$pp->course.' - '.$pp->course1}}</td>
+                                    <td class="text-left" >{{$pp->prerequisite.' - '.$pp->prerequisite1}}</td>
+                                    <td></td>       
+                                </tr>
+                             
+                                                
+                              
+                                    @endforeach     
+                            </tbody>
                 
-                    
+                        </table>  </div>
+                        <div class="tab-pane fade" id="nav-contact" role="tabpanel" aria-labelledby="nav-contact-tab">...</div>
+                      </div>
                   
                    
                 </div>

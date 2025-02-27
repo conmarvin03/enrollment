@@ -25,7 +25,6 @@ Route::middleware([
 // add prereq
     route::post('/addprereq',[ProgramController::class,'addprereq'])->name('addprereq');
   
-    route::put('/archive/prereq',[ProgramController::class,'archiveprereq'])->name('archiveprereq');
     Route::get('/students',[StudentController::class,'index'])->name('students');
     route::post('/addstudents',[StudentController::class,'addstudents'])->name('addstudents');
 
