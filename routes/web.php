@@ -28,6 +28,8 @@ Route::middleware([
     Route::get('/students',[StudentController::class,'index'])->name('students');
     route::post('/addstudents',[StudentController::class,'addstudents'])->name('addstudents');
 
+    Route::post('/import-excel', [ProgramController::class, 'import'])->name('import.excel');
+
     Route::get('/dashboard', function () {
         return view('dashboard');
     })->name('dashboard');

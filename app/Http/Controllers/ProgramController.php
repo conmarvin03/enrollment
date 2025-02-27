@@ -1,12 +1,15 @@
 <?php
 
 namespace App\Http\Controllers;
+
+use App\Imports\CurriculumImport;
 use App\Models\Programs;
 use App\Models\Curriculums;
 use App\Models\Prereqs;
 use Illuminate\Http\Request;
 use Exception;
 use Illuminate\Support\Facades\DB;
+use Maatwebsite\Excel\Facades\Excel;
 class ProgramController extends Controller
 {
     public function index()
@@ -155,5 +158,18 @@ class ProgramController extends Controller
         } catch (Exception $e) {
             return response()->json(['error' => 'Error updating status'], 500);
       }
+    }
+
+    public function import(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|mimes:xlsx,csv'
+        ]);
+
+        $id = $request->input('id');
+        
+        Excel::import(new CurriculumImport($id), $request->file('file'));
+
+        return back()->with('success', 'Excel file imported successfully.');
     }
 }

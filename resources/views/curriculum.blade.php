@@ -37,7 +37,19 @@
                         </div>
              
                           </div>
-                  <div class="row container-fluid">
+             
+                          <form action="{{ route('import.excel') }}" method="POST" enctype="multipart/form-data">
+                            @csrf
+                            <input type="file" name="file" required>
+                            <input type="text" name="id" value="{{$program->id}}" >
+                                            
+                            <button type="submit">Import Excel</button>
+                        </form>
+                        @if(session('success'))
+                            <p>{{ session('success') }}</p>
+                        @endif
+
+                          <div class="row container-fluid">
                     <div class="col-5">
                         <p class="h5">Program Information</p>
                         <hr>
@@ -85,7 +97,7 @@
                                                 @endforeach   
                                     </select>
                                 
-                                    <input type="text" value="{{$asd->pID}}" name="zxc" style="display: none;">
+                                    <input type="text" value="{{$program->id}}" name="zxc" style="display: none;">
                                     </div><div class="col">
                                         <button type="submit" class="btn btn-outline-success  mt-2" style="float: right;"><i class="fa-solid fa-plus"></i> Add Prerequisite</button>
                                    
