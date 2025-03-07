@@ -18,12 +18,11 @@ class CurriculumImport implements ToModel, WithHeadingRow
     }
     public function model(array $row)
     {
-        Log::info('Processing Row:', $row);
-
+       
         return  Curriculums::updateOrCreate(
-            [ 'pID' => $this->id], // Find by courseCode
-            ['pID'=>$this->id,
-                'courseCode' => $row['coursecode'],
+            [ 'pID' => $this->id , 'courseCode' => $row['coursecode']], // Find by courseCode
+           
+            [
             'course' => $row['course'],
             'type' => $row['type'],
             'semester' => $row['semester'],

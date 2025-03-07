@@ -8,6 +8,8 @@ use App\Models\Curriculums;
 use App\Models\Prereqs;
 use Illuminate\Http\Request;
 use Exception;
+use Illuminate\Support\Facades\Auth;
+use App\Models\Logs;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
 class ProgramController extends Controller
@@ -22,15 +24,21 @@ class ProgramController extends Controller
         try{
             $data=$request->validate([
                 'acc'=>'required',
-                'program'=> 'required'
+                'program'=> 'required',
+                'description'=>'required'
               
               
             ]);
             
             $newProduct=Programs::create(['acc'=>$request->acc,
             'program'=>$request->program,
+            'description'=>$request->description,  
             'status'=>'']);
-           
+            $user = Auth::user();
+            $idsss = Auth::id();
+        Logs::create(['userid'=>$idsss,
+        'remarks'=> 'User ID '.$idsss.' added program named '.$request->program.' in the system.'
+    ]);
             return redirect(route('programs'))->with('success', 'Program Added Successfully!');
         } catch (Exception $e) {
               return response()->json(['error' => 'Error updating status'], 500);
@@ -75,7 +83,11 @@ class ProgramController extends Controller
             'status'=>''
             ]);
            
-        
+            $user = Auth::user();
+            $idsss = Auth::id();
+        Logs::create(['userid'=>$idsss,
+        'remarks'=> 'User ID '.$idsss.' added prerequisite ( '.$request->coursecode.' - '.$request->prereq.') in the system.'
+    ]);
         return back()->with('success', 'Prerequisite Added Successfully!');  }
         } catch (Exception $e) {
               return response()->json(['error' => 'Error updating status'], 500);
@@ -84,30 +96,176 @@ class ProgramController extends Controller
     }
     public function editprogram(Programs $program)
     {
+        try {        $noofcourses = Curriculums::where('pID', '=', $program->id)->count();
+            $countlecture = Curriculums::where('pID', '=', $program->id)->where('leclab', '=', 'Lecture')->count();
+            $countlaboratory = Curriculums::where('pID', '=', $program->id)->where('leclab', '=', 'Laboratory')->count();
+            $sumUnits = Curriculums::where('pID', '=', $program->id)->sum('Unit');
+            $subjects = Curriculums::where('pID', $program->id)->get();
+            
+            $programs = Programs::findOrFail($program->id);
+            $pp = DB::table('prereqs as cp')
+            ->join('curriculums as c1', 'cp.courseCode', '=', 'c1.id')
+            ->join('curriculums as c2', 'cp.preReq', '=', 'c2.id')
+            ->select('cp.id', 'c1.courseCode as course', 'c1.course as course1', 'c2.courseCode as prerequisite', 'c2.course as prerequisite1')
+            ->where('cp.pID', '=', $program->id)
+            ->get();
+            // Fetch prerequisite relationships
+            $prereqs = DB::table('prereqs as p')
+                ->join('curriculums as c1', 'p.courseCode', '=', 'c1.id')
+                ->join('curriculums as c2', 'p.preReq', '=', 'c2.id')
+                ->select('c1.courseCode as course', 'c2.courseCode as prerequisite')
+                ->where('p.pID', '=', $program->id)
+                ->get();
+                $curriculum = Curriculums::where('pID', '=', $program->id)->get();
+              
+                
+                $mermaidGraph = "graph TB;\n";  // Top-to-Bottom direction
 
-        $noofcourses=Curriculums::where('pID','=',$program->id)->count();
-        $countlecture=Curriculums::where('pID','=',$program->id)->where('leclab','=','Lecture')->count();
-        $countlaboratory=Curriculums::where('pID','=',$program->id)->where('leclab','=','Laboratory')->count();
-        $countlaboratory=Curriculums::where('pID','=',$program->id)->where('leclab','=','Laboratory')->count();
-        $sumUnits=Curriculums::where('pID','=',$program->id)->sum('Unit');
-       
+                $subgraphs = [];
+                $prereqLinks = [];
+                
+                foreach ($prereqs as $prereq) {
+                    $course = preg_replace('/[^A-Za-z0-9]/', '_', $prereq->course);
+                    $prerequisite = preg_replace('/[^A-Za-z0-9]/', '_', $prereq->prerequisite);
+                
+                    // Swap direction: Now course points to prerequisite
+                    $prereqLinks[] = "{$course} -->|prerequisite| {$prerequisite};";
+                
+                    // Add subjects to semester-based subgraphs
+                    foreach ($subjects as $subject) {
+                        if ($subject->courseCode === $prereq->course || $subject->courseCode === $prereq->prerequisite) {
+                            $semesterKey = "{$subject->year}_{$subject->semester}";
+                            if (!isset($subgraphs[$semesterKey])) {
+                                $subgraphs[$semesterKey] = "subgraph Year {$subject->year} - Semester {$subject->semester}\n";
+                            }
+                            $sanitizedCourseCode = preg_replace('/[^A-Za-z0-9]/', '_', $subject->courseCode);
+                            $subgraphs[$semesterKey] .= "    {$sanitizedCourseCode}[\"{$subject->courseCode}\"];\n";
+                        }
+                    }
+                }
+                
+                // Merge everything into the Mermaid graph
+                foreach ($subgraphs as $subgraph) {
+                    $mermaidGraph .= $subgraph . "end;\n";
+                }
+                
+                // Add prerequisite links
+                $mermaidGraph .= implode("\n", $prereqLinks);
+                
+                echo $mermaidGraph;
 
-        $pp=DB::table('prereqs as cp')
-        ->join('curriculums as c1', 'cp.courseCode', '=', 'c1.id')
-        ->join('curriculums as c2', 'cp.preReq', '=', 'c2.id')
-        ->select('cp.id', 'c1.courseCode as course', 'c1.course as course1','c2.courseCode as prerequisite','c2.course as prerequisite1')
-        ->where('cp.pID','=',$program->id)
-        ->get();
 
-        $curriculum=Curriculums::where('pID','=',$program->id)->get();
-        return view('curriculum',['program'=>$program,'curriculum'=>$curriculum,'countlecture'=>$countlecture,'countlaboratory'=>$countlaboratory,
-        'sumUnits'=>$sumUnits,'noofcourses'=>$noofcourses,'pp'=> $pp]);
+
+
+            return view('curriculum', compact(
+                'mermaidGraph',
+                'programs',
+                'program',
+                'countlecture',
+                'countlaboratory',
+                'sumUnits',
+                'curriculum',
+                'noofcourses',
+                'pp'
+            ));
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            // $noofcourses = Curriculums::where('pID', '=', $program->id)->count();
+            // $countlecture = Curriculums::where('pID', '=', $program->id)->where('leclab', '=', 'Lecture')->count();
+            // $countlaboratory = Curriculums::where('pID', '=', $program->id)->where('leclab', '=', 'Laboratory')->count();
+            // $sumUnits = Curriculums::where('pID', '=', $program->id)->sum('Unit');
+            // $subjects = Curriculums::where('pID', $program->id)->get();
+            
+            // $programs = Programs::findOrFail($program->id);
+        
+            // // Fetch prerequisite relationships
+            // $prereqs = DB::table('prereqs as p')
+            //     ->join('curriculums as c1', 'p.courseCode', '=', 'c1.id')
+            //     ->join('curriculums as c2', 'p.preReq', '=', 'c2.id')
+            //     ->select('c1.courseCode as course', 'c2.courseCode as prerequisite')
+            //     ->where('p.pID', '=', $program->id)
+            //     ->get();
+        
+            //     $nodeDataArray = $subjects->map(function ($subject) {
+            //         // Assign colors based on subject type
+            //         $color = match($subject->type) {
+            //             'Core' => 'red',
+            //             'Elective' => 'blue',
+            //             'General' => 'green',
+            //             default => 'gray'
+            //         };
+                
+            //         return [
+            //             'key' => $subject->courseCode,
+            //             'courseCode' => $subject->courseCode,
+            //             'type' => $subject->type,
+            //             'semester' => $subject->semester,
+            //             'year' => $subject->years,
+            //             'color' => $color
+            //         ];
+            //     });
+                
+            //     $linkDataArray = $prereqs->map(function ($prereq) {
+            //         return [
+            //             'from' => $prereq->prerequisite,
+            //             'to' => $prereq->course
+            //         ];
+            //     });
+        
+            // $pp = DB::table('prereqs as cp')
+            //     ->join('curriculums as c1', 'cp.courseCode', '=', 'c1.id')
+            //     ->join('curriculums as c2', 'cp.preReq', '=', 'c2.id')
+            //     ->select('cp.id', 'c1.courseCode as course', 'c1.course as course1', 'c2.courseCode as prerequisite', 'c2.course as prerequisite1')
+            //     ->where('cp.pID', '=', $program->id)
+            //     ->get();
+        
+            // $curriculum = Curriculums::where('pID', '=', $program->id)->get();
+        
+            // return view('curriculum', compact(
+            //     'nodeDataArray',
+            //     'linkDataArray',
+            //     'programs',
+            //     'program',
+            //     'curriculum',
+            //     'countlecture',
+            //     'countlaboratory',
+            //     'sumUnits',
+            //     'noofcourses',
+            //     'pp'
+            // ));
+        } catch (\Exception $e) {
+            return back()->withError($e->getMessage());
+        }
+
     }
     public function updateprogram(Programs $program ,Request $request)
     {
         try{
         $program->update(['acc'=>$request->acc,
         'program'=>$request->program]);
+        
+        $user = Auth::user();
+        $idsss = Auth::id();
+    Logs::create(['userid'=>$idsss,
+    'remarks'=> 'User ID '.$idsss.' update the program ( '.$program->acc.') in the system.'
+]);
+
         return back()->with('success', 'Program Edit Successfully!');
     } catch (Exception $e) {
         return response()->json(['error' => 'Error updating status'], 500);
@@ -133,6 +291,12 @@ class ProgramController extends Controller
             'semester'=>$request->semester,
             'years'=>$request->years,
         ]);
+        $user = Auth::user();
+        $idsss = Auth::id();
+    Logs::create(['userid'=>$idsss,
+    'remarks'=> 'User ID '.$idsss.' update the course ( '.$request->cc.') in the system.'
+]);
+
             return back()->with('success', 'Program Edit Successfully!');
         } catch (Exception $e) {
             return response()->json(['error' => 'Error updating status'], 500);
@@ -153,7 +317,11 @@ class ProgramController extends Controller
             'leclab'=>$request->leclab,
             'unit'=>$request->unit
         ]);
-        
+        $user = Auth::user();
+        $idsss = Auth::id();
+    Logs::create(['userid'=>$idsss,
+    'remarks'=> 'User ID '.$idsss.' add the course ( '.$request->cc.') in the system.'
+]);
         return back()->with('success', 'Program Added Successfully!');
         } catch (Exception $e) {
             return response()->json(['error' => 'Error updating status'], 500);
@@ -167,7 +335,11 @@ class ProgramController extends Controller
         ]);
 
         $id = $request->input('id');
-        
+        $user = Auth::user();
+        $idsss = Auth::id();
+    Logs::create(['userid'=>$idsss,
+    'remarks'=> 'User ID '.$idsss.' import curriculum using excel with program id ( '.$request->input('id').') in the system.'
+]);
         Excel::import(new CurriculumImport($id), $request->file('file'));
 
         return back()->with('success', 'Excel file imported successfully.');

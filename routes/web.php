@@ -3,9 +3,13 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProgramController;
 use App\Http\Controllers\StudentController;
+use App\Http\Controllers\Controller;
+use App\Http\Controllers\CurriculumController;
+
 Route::get('/', function () {
     return view('welcome');
 });
+
 
 Route::middleware([
     'auth:sanctum',
@@ -14,7 +18,7 @@ Route::middleware([
 ])->group(function () {
 
     Route::get('/programs',[ProgramController::class,'index'])->name('programs');
-    route::post('/addrank',[ProgramController::class,'addprogram'])->name('addprograms');
+    route::post('/addprograms',[ProgramController::class,'addprogram'])->name('addprograms');
 
     route::post('/addcurriculums',[ProgramController::class,'addcurriculums'])->name('addcurriculums');
     route::get('/program/{program}/edit',[ProgramController::class,'editprogram'])->name('program.edit');
@@ -28,10 +32,20 @@ Route::middleware([
     Route::get('/students',[StudentController::class,'index'])->name('students');
     route::post('/addstudents',[StudentController::class,'addstudents'])->name('addstudents');
 
+    route::get('/student/{id}/edit',[StudentController::class,'editStudent'])->name('student.edit');
+    route::put('/student/{id}/update',[StudentController::class,'updateStudent'])->name('updatestudent'); 
     Route::post('/import-excel', [ProgramController::class, 'import'])->name('import.excel');
+    
 
-    Route::get('/dashboard', function () {
-        return view('dashboard');
-    })->name('dashboard');
- 
+    Route::post('/import-excelStudent', [StudentController::class, 'import'])->name('import.excelStudent');
+    
+  
+
+        Route::get('/users/create', [StudentController::class, 'create'])->name('users.create');
+        Route::post('/admin/users/store', [StudentController::class, 'store'])->name('users.store');
+
+    
+    
+
+    route::get('/dashboard',[CurriculumController::class,'index'])->name('dashboard');
 });

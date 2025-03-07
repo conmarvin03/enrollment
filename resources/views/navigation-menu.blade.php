@@ -12,10 +12,20 @@
 
                 <!-- Navigation Links -->
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
+                   
                     <x-nav-link href="{{ route('dashboard') }}" :active="request()->routeIs('dashboard')">
                         {{ __('Dashboard') }}
                     </x-nav-link>
-                </div>
+                </div> <?php if(Auth::user()->role=="Admin"){?>
+                <?php }else if(Auth::user()->role=="Student"){?> 
+                        
+                    <?php }else{?>
+                        <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
+                            <x-nav-link href="{{ route('users.create') }}" :active="request()->routeIs('Admins')">
+                                {{ __('Admins') }}
+                            </x-nav-link>
+                        </div>
+
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
                     <x-nav-link href="{{ route('programs') }}" :active="request()->routeIs('programs')">
                         {{ __('Programs') }}
@@ -25,11 +35,13 @@
                    <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
                     <x-nav-link href="{{ route('students') }}" :active="request()->routeIs('students')">
                         {{ __('Students') }}
-                    </x-nav-link>
+                    </x-nav-link> 
+                   
                 </div>
                 
-              
-                </div>
+        
+                <?php }?>
+                </div>      
                  <div class="hidden sm:flex sm:items-center sm:ms-6">
                 
                     <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">

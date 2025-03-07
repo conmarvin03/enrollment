@@ -28,7 +28,21 @@
     @endif
     <div class="py-12">
         <div class="max-w-12xl mx-auto sm:px-6 lg:px-8">
-           
+            {{-- <script src="https://cdnjs.cloudflare.com/ajax/libs/gojs/2.3.15/go.js"></script>
+
+            <style>
+                #myDiagramDiv {
+                    width: 100%;
+                    height: 600px;
+                    border: 1px solid black;
+                }
+            </style> --}}
+         
+            <script type="module">
+                import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+                mermaid.initialize({ startOnLoad: true });
+            </script>
+        
                 <div class="card card-success">
                     <div class="card card-success">
                         <div class="card-header">
@@ -37,18 +51,19 @@
                         </div>
              
                           </div>
-             
-                          <form action="{{ route('import.excel') }}" method="POST" enctype="multipart/form-data">
-                            @csrf
-                            <input type="file" name="file" required>
-                            <input type="text" name="id" value="{{$program->id}}" >
-                                            
-                            <button type="submit">Import Excel</button>
-                        </form>
-                        @if(session('success'))
-                            <p>{{ session('success') }}</p>
-                        @endif
-
+                         
+                          <div class="row">
+                           
+                            <div class="col-6"> <form action="{{ route('import.excel') }}" method="POST" enctype="multipart/form-data">
+                                @csrf
+                               <button type="submit" class="btn btn-dark" style="float: right;">Import Excel</button>  <h2 class="lead p-3">Import Excel</h2> <hr class=" w-100">
+                          
+                            <input type="file"  class="p-3"  class="form-control" name="file" required><br>
+                          
+                            <input type="text" name="id" value="{{$program->id}}" style="display: none;" >
+                                           </form> 
+                        </div>
+                          </div>
                           <div class="row container-fluid">
                     <div class="col-5">
                         <p class="h5">Program Information</p>
@@ -281,6 +296,104 @@
     </div>
 </div>     </div>
 </div>
+
+
+<h2>{{ $programs->program_name }} Curriculum Flowchart</h2>
+    
+<div class="mermaid">
+    {!! $mermaidGraph !!}
+</div>
+
+
+
+{{-- <h2>{{ $program->program }} Curriculum Flowchart</h2> --}}
+
+{{-- <!-- Flowchart Container -->
+<div id="myDiagramDiv"></div><script>
+    var $ = go.GraphObject.make;
+
+    var myDiagram = $(go.Diagram, "myDiagramDiv", {
+        initialAutoScale: go.Diagram.Uniform,
+        layout: $(go.GridLayout, { 
+            wrappingColumn: 6,  // Ensures semesters are aligned
+            cellSize: new go.Size(1, 1),
+            spacing: new go.Size(100, 50),
+        }),
+        allowMove: false,
+        allowCopy: false,
+        allowDelete: false,
+        allowSelect: false,
+        allowTextEdit: false,
+        isReadOnly: true,
+        allowZoom: true,
+        "toolManager.mouseWheelBehavior": go.ToolManager.WheelZoom,
+    });
+
+    // Define Subject Colors Based on Type
+    function getColor(type) {
+        switch (type) {
+            case 'General Education': return 'lightblue';
+            case 'Professional Courses': return 'lightgreen';
+            case 'Core Courses': return 'tomato';
+            default: return 'gray';
+        }
+    }
+
+    // Define Node Template (Subjects inside table cells)
+    myDiagram.nodeTemplate =
+        $(go.Node, "Auto",
+            { locationSpot: go.Spot.Center },
+            $(go.Shape, "RoundedRectangle",
+                { strokeWidth: 1, portId: "", fromLinkable: true, toLinkable: true },
+                new go.Binding("fill", "color")
+            ),
+            $(go.TextBlock, { margin: 8, font: "bold 12px Arial", textAlign: "center" },
+                new go.Binding("text", "courseCode"))
+        );
+
+    // Define Link Template (Prerequisite Arrows)
+    myDiagram.linkTemplate =
+        $(go.Link,
+            { routing: go.Link.Orthogonal, corner: 5 },
+            $(go.Shape, { strokeWidth: 2 }), 
+            $(go.Shape, { toArrow: "Standard" })
+        );
+
+    // Dummy Data (Replace with Laravel JSON)
+    var nodeDataArray = {!! json_encode($nodeDataArray) !!};
+    var linkDataArray = {!! json_encode($linkDataArray) !!};
+
+
+    // Assign Colors and Proper Row Positions
+    nodeDataArray.forEach((node) => {
+        node.color = getColor(node.type);
+        node.row = (node.year - 1) * 2 + (node.semester - 1);
+    });
+
+    // Generate Table Headers for Year & Semester
+    var tableHeaders = [];
+    for (var y = 1; y <= 4; y++) {
+        for (var s = 1; s <= 2; s++) {
+            tableHeaders.push({
+                key: "header-" + y + "-" + s,
+                courseCode: `Year ${y} - Semester ${s}`,
+                color: "gray",
+                isHeader: true,
+                row: (y - 1) * 2 + (s - 1)
+            });
+        }
+    }
+
+    // Merge Headers with Subject Data
+    nodeDataArray = [...tableHeaders, ...nodeDataArray];
+
+    // Assign Grid Layout Wrapping (One Row per Semester)
+    myDiagram.layout.wrappingColumn = 6; // Adjust column spacing
+    myDiagram.layout.arrangement = go.GridLayout.Position; 
+
+    // Assign Data to Diagram
+    myDiagram.model = new go.GraphLinksModel(nodeDataArray, linkDataArray);
+</script> --}}
 </x-app-layout>
 
       
@@ -297,6 +410,8 @@
 <script src="https://cdn.datatables.net/buttons/3.0.2/js/buttons.html5.min.js"></script>
 <script>
    new DataTable('#example', {
+    pageLength: 15,
+
 layout: {
     topStart: {
      

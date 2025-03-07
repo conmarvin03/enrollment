@@ -37,7 +37,15 @@
              
                           </div>
                   <div class="row container-fluid">
-                
+                    <form action="{{ route('import.excelStudent') }}" method="POST" enctype="multipart/form-data">
+                        @csrf
+                       <button type="submit" class="btn btn-dark" style="float: right;">Import Excel</button>  <h2 class="lead p-3">Import Excel</h2> <hr class=" w-100">
+                  
+                    <input type="file"  class="p-3"  class="form-control" name="file" required><br>
+                  
+                                   </form> 
+
+
                     <div class="col">
                     
                         <p class="h5">Students Information</p>
@@ -131,7 +139,7 @@
                                 <td class="text-center" >{{$students->name}}</td>
                                 <td class="text-center" >{{$students->email}}</td>
                                 <td class="text-center" >{{$students->program}}</td>
-                                <td><a class="navbar-brand text-dark btn btn-primary" href=""><i class="fa-regular fa-pen-to-square"></i> Edit</a>
+                                <td><a class="navbar-brand text-dark btn btn-primary" href="{{route('student.edit',['id'=> $students->kldID])}}"><i class="fa-regular fa-pen-to-square"></i> Edit</a>
                                     <a class="navbar-brand text-dark btn btn-warning" href=""><i class="fa-regular fa-pen-to-square"></i> View Grades</a>
                                 </td>
             

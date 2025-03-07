@@ -46,6 +46,8 @@
                                 
                             <input type="text" class="form-control w-50 form-control-border border-success" name="acc" required placeholder="Enter Accronymn">
                             <input type="text" class="form-control w-100 form-control-border border-success" name="program" required placeholder="Enter Program">
+                            <textarea class="form-control w-100 form-control-border border-success" rows="3" name="description" required placeholder="Enter Program Description"></textarea>
+                     
                             <button type="submit" class="btn btn-outline-success mt-2" style="float: right;"><i class="fa-solid fa-plus"></i> Add Program</button>
                            
                             </form>
