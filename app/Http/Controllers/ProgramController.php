@@ -19,6 +19,25 @@ class ProgramController extends Controller
         $program=Programs::all();
         return view('programs',['program'=>$program]);
     }
+
+    public function updateStatus(Curriculums $curriculums ,Request $request)
+    {
+        try{
+           
+            $curriculums->where('id', $request->id)
+            ->update(['status' => 'archived']);;
+            
+            $user = Auth::user();
+            $idsss = Auth::id();
+        Logs::create(['userid'=>$idsss,
+        'remarks'=> 'User ID '.$idsss.' delete the subject ( '.$curriculums->id.') in the system.'
+    ]);
+    
+            return back()->with('success', 'Program Edit Successfully!');
+        } catch (Exception $e) {
+            return back()->with('error', 'Error!');
+      }
+    }
     public function addprogram(Request $request)
     {
         try{
@@ -96,11 +115,11 @@ class ProgramController extends Controller
     }
     public function editprogram(Programs $program)
     {
-        try {        $noofcourses = Curriculums::where('pID', '=', $program->id)->count();
-            $countlecture = Curriculums::where('pID', '=', $program->id)->where('leclab', '=', 'Lecture')->count();
-            $countlaboratory = Curriculums::where('pID', '=', $program->id)->where('leclab', '=', 'Laboratory')->count();
-            $sumUnits = Curriculums::where('pID', '=', $program->id)->sum('Unit');
-            $subjects = Curriculums::where('pID', $program->id)->get();
+        try {        $noofcourses = Curriculums::where('pID', '=', $program->id)->where('status','!=','archived')->count();
+            $countlecture = Curriculums::where('pID', '=', $program->id)->where('leclab', '=', 'Lecture')->where('status','!=','archived')->count();
+            $countlaboratory = Curriculums::where('pID', '=', $program->id)->where('leclab', '=', 'Laboratory')->where('status','!=','archived')->count();
+            $sumUnits = Curriculums::where('pID', '=', $program->id)->where('status','!=','archived')->sum('Unit');
+            $subjects = Curriculums::where('pID', $program->id)->where('status','!=','archived')->get();
             
             $programs = Programs::findOrFail($program->id);
             $pp = DB::table('prereqs as cp')
@@ -116,49 +135,24 @@ class ProgramController extends Controller
                 ->select('c1.courseCode as course', 'c2.courseCode as prerequisite')
                 ->where('p.pID', '=', $program->id)
                 ->get();
-                $curriculum = Curriculums::where('pID', '=', $program->id)->get();
-              
-                
-                $mermaidGraph = "graph TB;\n";  // Top-to-Bottom direction
 
-                $subgraphs = [];
-                $prereqLinks = [];
-                
-                foreach ($prereqs as $prereq) {
-                    $course = preg_replace('/[^A-Za-z0-9]/', '_', $prereq->course);
-                    $prerequisite = preg_replace('/[^A-Za-z0-9]/', '_', $prereq->prerequisite);
-                
-                    // Swap direction: Now course points to prerequisite
-                    $prereqLinks[] = "{$course} -->|prerequisite| {$prerequisite};";
-                
-                    // Add subjects to semester-based subgraphs
-                    foreach ($subjects as $subject) {
-                        if ($subject->courseCode === $prereq->course || $subject->courseCode === $prereq->prerequisite) {
-                            $semesterKey = "{$subject->year}_{$subject->semester}";
-                            if (!isset($subgraphs[$semesterKey])) {
-                                $subgraphs[$semesterKey] = "subgraph Year {$subject->year} - Semester {$subject->semester}\n";
-                            }
-                            $sanitizedCourseCode = preg_replace('/[^A-Za-z0-9]/', '_', $subject->courseCode);
-                            $subgraphs[$semesterKey] .= "    {$sanitizedCourseCode}[\"{$subject->courseCode}\"];\n";
-                        }
-                    }
-                }
-                
-                // Merge everything into the Mermaid graph
-                foreach ($subgraphs as $subgraph) {
-                    $mermaidGraph .= $subgraph . "end;\n";
-                }
-                
-                // Add prerequisite links
-                $mermaidGraph .= implode("\n", $prereqLinks);
-                
-                echo $mermaidGraph;
 
+                $curriculum = Curriculums::leftJoin('prereqs as p', 'curriculums.id', '=', 'p.courseCode')
+                ->where('curriculums.pID', '=', $program->id)
+                ->where('curriculums.status', '!=', 'archived')
+                
+                ->orderBy('curriculums.type')
+                ->orderBy('curriculums.years')
+                ->orderBy('curriculums.semester')
+                ->orderBy('curriculums.courseCode')
+                ->select('curriculums.*')
+                ->get();
+            
 
 
 
             return view('curriculum', compact(
-                'mermaidGraph',
+                
                 'programs',
                 'program',
                 'countlecture',

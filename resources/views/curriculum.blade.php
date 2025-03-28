@@ -38,10 +38,174 @@
                 }
             </style> --}}
          
-            <script type="module">
-                import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
-                mermaid.initialize({ startOnLoad: true });
-            </script>
+            <style>
+                .flowchart-container {
+                  display: flex;
+                  flex-wrap: wrap;
+                  gap: 1rem;
+                  padding: 1rem;
+                  width: 100%;
+                }
+              
+                .year-header {
+                  font-size: 1rem;
+                  font-weight: bold;
+                  margin-bottom: 1rem;
+                  text-align: center;
+                  color: #0074cc;
+                }
+              
+                .semester-label {
+                  font-weight: 600;
+                  margin-bottom: 0.5rem;
+                  color: #555;
+                  font-size: 0.9rem;
+                }
+              
+                .subject {
+                  background-color: #e3f2fd;
+                  border-left: 5px solid #1976d2;
+                  padding: 0.5rem;
+                  margin-bottom: 0.5rem;
+                  border-radius: 4px;
+                  font-size: 0.85rem;
+                  cursor: help;
+                }
+              </style>
+              @php
+              $prereqs = DB::table('prereqs as p')
+                  ->join('curriculums as c1', 'p.courseCode', '=', 'c1.id')
+                  ->join('curriculums as c2', 'p.preReq', '=', 'c2.id')
+                  ->select('c1.courseCode as course', 'c2.courseCode as prerequisite')
+                  ->where('p.pID', '=', $program->id)
+                  ->get();
+              @endphp
+              <script src="https://cdn.jsdelivr.net/npm/leader-line-new/leader-line.min.js"></script>
+              
+              @php
+                $maxYear = $curriculum->max('years');
+              @endphp
+              
+              <div class="row">
+                @for ($year = 1; $year <= $maxYear; $year++)
+                  @php
+                    $yearSubjects = $curriculum->where('years', $year);
+                  @endphp
+              
+                  @if ($yearSubjects->count())
+                    <div class="col">
+                      <div class="year-header">Year {{ $year }}</div>
+                      <div class="row">
+                        @foreach ([1 => '1st Semester', 2 => '2nd Semester', 3 => 'Summer'] as $sem => $semLabel)
+                          @php
+                            $semesterSubjects = $yearSubjects->where('semester', $sem);
+                          @endphp
+              
+                          @if ($semesterSubjects->count())
+                            <div class="col">
+                              <div class="semester-label">{{ $semLabel }}</div>
+              
+                              @foreach ($semesterSubjects as $subject)
+                                @php
+                                  $type = strtolower($subject->type);
+                                  $color = match($type) {
+                                      'general education' => '#bbdefb',
+                                      'professional course' => '#c8e6c9',
+                                      'core course' => '#e1bee7',
+                                      default => '#f5f5f5',
+                                  };
+                                  $border = match($type) {
+                                      'general education' => '#1976d2',
+                                      'professional course' => '#388e3c',
+                                      'core course', 'lecture/laboratory', 'lab/lec' => '#8e24aa',
+                                      default => '#757575',
+                                  };
+                                @endphp
+                                <div
+                                  class="subject"
+                                 id="subject-{{ $subject->courseCode }}"
+                                  style="background-color: {{ $color }}; border-left: 5px solid {{ $border }};"
+                                  title="{{ $subject->course }}"
+                                >
+                                  <strong>{{ $subject->courseCode }}</strong><br>
+                                  <small>{{ $subject->leclab }} • {{ $subject->unit }} Unit{{ $subject->unit > 1 ? 's' : '' }}</small>
+                                </div>
+                              @endforeach
+                            </div>
+                          @endif
+                        @endforeach
+                      </div>
+                    </div>
+                  @endif
+                @endfor
+              </div>
+              
+              <script src="https://cdn.jsdelivr.net/npm/leader-line-new/leader-line.min.js"></script>
+             <script src="https://cdn.jsdelivr.net/npm/leader-line-new/leader-line.min.js"></script>
+
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const prerequisites = @json($prereqs);
+
+    const getColor = (type, inCount, outCount) => {
+      // Prioritize color override based on multiple connections
+      if ((inCount > 1 || outCount > 1)) return '#ff9800'; // Orange for multi-connect
+      switch (type?.toLowerCase()) {
+        case 'general education': return '#1976d2'; // Blue
+        case 'professional course': return '#388e3c'; // Green
+        case 'core course':
+        case 'lecture/laboratory':
+        case 'lab/lec': return '#8e24aa'; // Purple
+        default: return '#757575'; // Gray
+      }
+    };
+
+    // Count connections
+    const inMap = {};
+    const outMap = {};
+    prerequisites.forEach(pr => {
+      inMap[pr.course] = (inMap[pr.course] || 0) + 1;
+      outMap[pr.prerequisite] = (outMap[pr.prerequisite] || 0) + 1;
+    });
+
+    prerequisites.forEach(pr => {
+      const from = document.getElementById(`subject-${pr.course}`);
+      const to = document.getElementById(`subject-${pr.prerequisite}`);
+
+      if (from && to) {
+        const type = to.getAttribute("title-type") || '';
+        const inCount = inMap[pr.course] || 0;
+        const outCount = outMap[pr.prerequisite] || 0;
+
+        new LeaderLine(
+          from,
+          to,
+          {
+            color: 'gray',
+            path: 'straight',
+            startSocket: 'right',
+            endSocket: 'bottom',
+            startPlug: 'disc',
+            endPlug: 'arrow1',
+            size: 2,
+            dash: { animation: true }
+          }
+        );
+      }
+    });
+  });
+</script>
+
+              
+              {{-- Optional: Prerequisite Map Debug --}}
+              {{-- 
+              <h4>Prerequisite Map</h4>
+              <ul>
+                @foreach ($pp as $row)
+                  <li><strong>{{ $row->prerequisite }}</strong> → {{ $row->course }}</li>
+                @endforeach
+              </ul> 
+              --}}
         
                 <div class="card card-success">
                     <div class="card card-success">
@@ -249,7 +413,22 @@
                                         <td class="text-center" >{{$curriculum->unit}}</td>
                                         <td class="text-center" >{{$curriculum->years}}</td>
                                         <td class="text-center" >{{$curriculum->semester}}</td>
-                                        <td><a class="navbar-brand text-dark btn btn-outline-secondary" href="{{route('course.edit',['curriculum'=> $curriculum])}}"><i class="fa-regular fa-pen-to-square"></i> Edit</a>
+                                        <td>
+                                            <div class="row">
+                                                <div class="col">
+                                            <a class="navbar-brand text-light mt-2 btn btn-success" href="{{route('course.edit',['curriculum'=> $curriculum])}}"><i class="fa-regular fa-pen-to-square"></i> Edit</a>
+                                                </div>
+                                                
+                                                <div class="col">
+                                                    <form action="{{route('updateStatus',['curriculum'=> $curriculum])}}" method="post">
+                                          
+                                                @csrf
+                                                    @method('put')
+                                                    <button type="submit" class="btn btn-danger mt-2" style="float: right;"><i class="fa-solid fa-trash"></i> Remove</button>
+                                             
+                                                    <input type="text" value="{{$curriculum->id}}" name="id" style="display:none;">
+                                                </form>
+                                                </div></div>  
                                         </td>
                     
                                     </tr>
@@ -262,7 +441,7 @@
                             </table>  
                             </div>
                         </div>
-                        <div class="tab-pane fade" id="nav-profile" role="tabpanel" aria-labelledby="nav-profile-tab">  <table  id="example"  class="table-responsive text-center display table table-striped table-hover table-bordered border-success w-50" >
+                        <div class="tab-pane fade" id="nav-profile" role="tabpanel" aria-labelledby="nav-profile-tab">  <table  id="example"  class="table-responsive text-center display table table-striped table-hover table-bordered border-success w-100" >
                             <thead class="text-center">
                              <tr>
                                 <th class="text-center">ID</th>
@@ -285,7 +464,6 @@
                             </tbody>
                 
                         </table>  </div>
-                        <div class="tab-pane fade" id="nav-contact" role="tabpanel" aria-labelledby="nav-contact-tab">...</div>
                       </div>
                   
                    
@@ -298,11 +476,6 @@
 </div>
 
 
-<h2>{{ $programs->program_name }} Curriculum Flowchart</h2>
-    
-<div class="mermaid">
-    {!! $mermaidGraph !!}
-</div>
 
 
 

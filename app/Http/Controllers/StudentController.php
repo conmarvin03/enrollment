@@ -24,6 +24,10 @@ class StudentController extends Controller
         $programs=Programs::all();
         return view('student',['students'=>$students,'programs'=>$programs]);
     }
+    public function viewGrades()
+{ return view('viewgrades');
+
+    }
     public function create()
     {
         return view('addadmin'); // Reuse Jetstream's register form

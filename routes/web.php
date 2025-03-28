@@ -26,6 +26,9 @@ Route::middleware([
     route::get('/course/{curriculum}/edit',[ProgramController::class,'editcourse'])->name('course.edit'); 
     route::put('/course/{curriculum}/update',[ProgramController::class,'updatecourse'])->name('updatecourse');    
 
+
+    route::put('/curriculum/{curriculum}/update',[ProgramController::class,'updateStatus'])->name('updateStatus');
+
 // add prereq
     route::post('/addprereq',[ProgramController::class,'addprereq'])->name('addprereq');
   
@@ -34,6 +37,12 @@ Route::middleware([
 
     route::get('/student/{id}/edit',[StudentController::class,'editStudent'])->name('student.edit');
     route::put('/student/{id}/update',[StudentController::class,'updateStudent'])->name('updatestudent'); 
+
+    route::get('/student/{id}/grades',[StudentController::class,'viewGrades'])->name('viewGrades');
+    
+
+
+
     Route::post('/import-excel', [ProgramController::class, 'import'])->name('import.excel');
     
 

@@ -119,7 +119,7 @@
                 <div class="card card-success">
                     <div class="card-header">
                         
-                    <h3 class="card-title"> <i class="fa-solid fa-list"></i>  &nbsp;&nbsp;Courses</h3>
+                    <h3 class="card-title"> <i class="fa-solid fa-list"></i>  &nbsp;&nbsp;Students</h3>
                   
                     </div>
                     <table  id="example"  class="table-responsive text-center display table table-striped table-hover table-bordered border-success" >
@@ -140,7 +140,7 @@
                                 <td class="text-center" >{{$students->email}}</td>
                                 <td class="text-center" >{{$students->program}}</td>
                                 <td><a class="navbar-brand text-dark btn btn-primary" href="{{route('student.edit',['id'=> $students->kldID])}}"><i class="fa-regular fa-pen-to-square"></i> Edit</a>
-                                    <a class="navbar-brand text-dark btn btn-warning" href=""><i class="fa-regular fa-pen-to-square"></i> View Grades</a>
+                                    <a class="navbar-brand text-dark btn btn-warning" href="{{route('viewGrades',['id'=> $students->kldID])}}"><i class="fa-regular fa-pen-to-square"></i> View Grades</a>
                                 </td>
             
                             </tr>
