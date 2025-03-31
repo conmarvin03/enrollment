@@ -12,17 +12,29 @@
 
                 <!-- Navigation Links -->
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                   
+                   <?php 
+use Illuminate\Support\Facades\Auth; ?>
                     <x-nav-link href="{{ route('dashboard') }}" :active="request()->routeIs('dashboard')">
                         {{ __('Dashboard') }}
                     </x-nav-link>
-                </div> <?php if(Auth::user()->role=="Admin"){?>
+                </div> <?php if(Auth::user()->role=="teacher"){?>
+
+                    <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
+                            <x-nav-link href="{{ route('addgradesubmission') }}" :active="request()->routeIs('Grades')">
+                                {{ __('Grades') }}
+                            </x-nav-link>
+                        </div>
                 <?php }else if(Auth::user()->role=="Student"){?> 
                         
                     <?php }else{?>
                         <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
                             <x-nav-link href="{{ route('users.create') }}" :active="request()->routeIs('Admins')">
                                 {{ __('Admins') }}
+                            </x-nav-link>
+                        </div>
+                        <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
+                            <x-nav-link href="{{ route('users.teacher') }}" :active="request()->routeIs('Teachers')">
+                                {{ __('Teachers') }}
                             </x-nav-link>
                         </div>
 

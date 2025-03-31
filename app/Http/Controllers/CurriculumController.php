@@ -18,7 +18,10 @@ class CurriculumController extends Controller
         }else if(Auth::user()->role=="Student")
         {
             
-            return view('home'); 
+            return view('dashboard'); 
+        }else{
+
+            return view('dashboard'); 
         }
     }
 }

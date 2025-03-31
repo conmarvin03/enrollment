@@ -43,6 +43,21 @@ class StudentController extends Controller
 
         return redirect()->route('addadmin')->with('success', 'User added successfully!');
     }
+    public function teacherscreate()
+    {
+        return view('addteacher'); // Reuse Jetstream's register form
+    }
+
+    public function teachersstore(Request $request)
+    {
+        // Use Jetstream's CreateNewUser action
+        $userCreator = new CreateNewUser();
+        
+        // Validate and create user
+        $user = $userCreator->teachercreate($request->all());
+
+        return redirect()->route('users.teacher')->with('success', 'User added successfully!');
+    }
 
     public function import(Request $request)
     {

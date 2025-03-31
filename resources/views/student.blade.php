@@ -140,6 +140,7 @@
                                 <td class="text-center" >{{$students->email}}</td>
                                 <td class="text-center" >{{$students->program}}</td>
                                 <td><a class="navbar-brand text-dark btn btn-primary" href="{{route('student.edit',['id'=> $students->kldID])}}"><i class="fa-regular fa-pen-to-square"></i> Edit</a>
+        </form>
                                     <a class="navbar-brand text-dark btn btn-warning" href="{{route('viewGrades',['id'=> $students->kldID])}}"><i class="fa-regular fa-pen-to-square"></i> View Grades</a>
                                 </td>
             
