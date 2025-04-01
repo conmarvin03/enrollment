@@ -23,7 +23,7 @@ class GradeController extends Controller
 
     public function index()
     {
-        $subjects = Curriculums::where('status','!=','archived')->get();
+        $subjects = Curriculums::where('status','=',NULL)->get();
         $settings = settings::where('id','=',1)->get();
        
         $Gradesubmissions=Gradesubmissions::all();
