@@ -115,11 +115,11 @@ class ProgramController extends Controller
     }
     public function editprogram(Programs $program)
     {
-        try {        $noofcourses = Curriculums::where('pID', '=', $program->id)->where('status','!=','archived')->count();
-            $countlecture = Curriculums::where('pID', '=', $program->id)->where('leclab', '=', 'Lecture')->where('status','!=','archived')->count();
-            $countlaboratory = Curriculums::where('pID', '=', $program->id)->where('leclab', '=', 'Laboratory')->where('status','!=','archived')->count();
-            $sumUnits = Curriculums::where('pID', '=', $program->id)->where('status','!=','archived')->sum('Unit');
-            $subjects = Curriculums::where('pID', $program->id)->where('status','!=','archived')->get();
+        try {        $noofcourses = Curriculums::where('pID', '=', $program->id)->where('curriculums.status', '=', NULL)->count();
+            $countlecture = Curriculums::where('pID', '=', $program->id)->where('leclab', '=', 'Lecture')->where('curriculums.status', '=', NULL)->count();
+            $countlaboratory = Curriculums::where('pID', '=', $program->id)->where('leclab', '=', 'Laboratory')->where('curriculums.status', '=', NULL)->count();
+            $sumUnits = Curriculums::where('pID', '=', $program->id)->where('curriculums.status', '=', NULL)->sum('Unit');
+            $subjects = Curriculums::where('pID', $program->id)->where('curriculums.status', '=', NULL)->get();
             
             $programs = Programs::findOrFail($program->id);
             $pp = DB::table('prereqs as cp')
@@ -139,7 +139,7 @@ class ProgramController extends Controller
 
                 $curriculum = Curriculums::leftJoin('prereqs as p', 'curriculums.id', '=', 'p.courseCode')
                 ->where('curriculums.pID', '=', $program->id)
-                ->where('curriculums.status', '!=', 'archived')
+                ->where('curriculums.status', '=', NULL)
                 
                 ->orderBy('curriculums.type')
                 ->orderBy('curriculums.years')
