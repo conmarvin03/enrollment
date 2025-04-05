@@ -25,7 +25,10 @@ class StudentController extends Controller
         return view('student',['students'=>$students,'programs'=>$programs]);
     }
     public function viewGrades()
-{ return view('viewgrades');
+{
+    
+    
+    return view('viewgrades');
 
     }
     public function create()

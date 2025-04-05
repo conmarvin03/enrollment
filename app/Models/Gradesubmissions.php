@@ -11,6 +11,6 @@ class Gradesubmissions extends Model
     use HasFactory;
 
     protected $fillable = [
-       'gsID','gradeName','section','subject', 'semester','year','status','tID'
+       'gsID','gradeName','section','subject', 'semester','coursecode','year','status','tID'
     ];
 }

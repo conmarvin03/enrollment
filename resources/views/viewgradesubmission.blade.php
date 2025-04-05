@@ -3,28 +3,32 @@
   </head>
 <x-app-layout>
     <x-slot name="header">
-        @if (session('success'))
+        @if(session('error'))
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
         <script>
-            Swal.fire({
-                icon: 'success',
-                title: 'Success!',
-                text: '{{ session('success') }}',
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
+            document.addEventListener("DOMContentLoaded", function() {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Import Failed',
+                    html: `{!! nl2br(session("error")) !!}`,
+                });
             });
         </script>
-    @endif
-    @if (session('error'))
+        @endif
+        
+        @if(session('success'))
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
         <script>
-            Swal.fire({
-                icon: 'error',
-                title: 'Oops...',
-                text: '{{ session('error') }}',
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
+            document.addEventListener("DOMContentLoaded", function() {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Success',
+                    text: '{{ session("success") }}',
+                });
             });
         </script>
-    @endif
+        @endif
+        
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
        
@@ -55,11 +59,12 @@
                                     <div class="col-4">
                                    
                                     @foreach ($gradessubmissions as $gradessubmissions)
-                                    <form action="{{route('edit.grades',['Gradesubmissions'=> $gradessubmissions])}}" method="post" enctype="multipart/form-data">
+                                    <form action="{{route('updategrades',['Gradesubmissions'=> $gradessubmissions])}}" method="post" enctype="multipart/form-data">
                                     @csrf
                                     @method('put') 
                                     <label>Grade Name:</label>
-                                     <input type="text" class="form-control w-100 border-secondary" name="gName"  value=" {{ $gradessubmissions->gradeName }}" placeholder="Enter Grade Name">
+                                    <input type="text" class="form-control w-100 border-secondary" name="gName"  value=" {{ $gradessubmissions->gradeName }}" placeholder="Enter Grade Name">
+                                    <input type="text" class="form-control w-100 border-secondary" name="id"  value=" {{ $gradessubmissions->id }}" style="display: none;" placeholder="Enter Grade Name">
                                  
                                      
                                      
@@ -74,7 +79,7 @@
                                         <option value="">Select Course Code</option>
                                         @foreach ($subjects as $subjects)
                                        
-                                            <option <?php if($subjects->courseCode==$gradessubmissions->subject){?> selected <?php }?> value="{{$subjects->courseCode}}">{{$subjects->courseCode.'-'.$subjects->course}}</option>
+                                            <option <?php if($subjects->courseCode==$gradessubmissions->coursecode){?> selected <?php }?> value="{{$subjects->courseCode}}">{{$subjects->courseCode.'-'.$subjects->course}}</option>
                                                 @endforeach   
                                     </select>
 
@@ -119,12 +124,17 @@
                                  <div class="row">
                                
                         <h2 class="lead p-3">Import Grades</h2>
-                  <div class="col-4">  <form action="{{ route('import.excel') }}" method="POST" enctype="multipart/form-data">
+                  <div class="col-4">  
+                    <form action="{{ route('importGrades') }}" method="POST" enctype="multipart/form-data">
                         @csrf
-                  <input type="file"  class="p-3"  class="form-control" name="file" required>
-                  <input type="text" value="{{$gradessubmissions->id}}" name="ids" >
+                  <input type="file"  class="p-3"  class="form-control" name="file" required >
+                  <input type="text" value="{{$gradessubmissions->id}}" name="ids" style="display: none;">
+                  <input type="text" value="{{$gradessubmissions->section}}" name="section" style="display: none;" >
+                  <input type="text" value="{{$gradessubmissions->year}}" name="year" style="display: none;">
+                  <input type="text" value="{{$gradessubmissions->semester}}" name="semester" style="display: none;">
+                  <input type="text" value="{{$gradessubmissions->coursecode}}" name="subject" style="display: none;">
                        
-                  <input type="text" value="{{$gradessubmissions->tID}}"  name="tID" >
+                  <input type="text" value="{{$gradessubmissions->tID}}"  name="tID" style="display: none;" >
                        
                     <button type="submit" class="btn btn-dark" style="float: right;">Import Excel</button> 
                     </form> 
@@ -152,6 +162,11 @@
                     <h3 class="card-title"> <i class="fa-solid fa-list"></i>  &nbsp;&nbsp;Submitted Grades</h3>
                   
                     </div>
+                    @if(session('grades'))
+                    <h3>Imported Grades</h3>
+                   
+                @endif
+
                     <table  id="example"  class="table-responsive text-center display table table-striped table-hover table-bordered border-success" >
                     <thead class="text-center">
                          <tr>
@@ -166,12 +181,30 @@
                         <tbody>
                         @foreach ($gradesStudent as $gradesStudent)
                         <tr>
+                            <form action="{{route('editgrades',['id'=> $gradesStudent->id])}}" method="post" enctype="multipart/form-data">
+                                @csrf
+                                    @method('put')
+                          
                         <td class="text-center" ><b>{{$gradesStudent->id}}</b></td>
                         <td class="text-center" ><b>{{$gradesStudent->kldID}}</b></td>
                         <td class="text-center" ><b>{{$gradesStudent->name}}</b></td>
-                        <td class="text-center" ><b>{{$gradesStudent->grade}}</b></td>
+                        <td class="text-center" ><b>  <select name="grade" class="form-control w-100">
+                            <option value="">--</option>
+                            
+                            <option <?php if($gradesStudent->grade==1.0){ ?> selected <?php }?> ?>1.00</option>
+                            <option <?php if($gradesStudent->grade==1.25){ ?> selected <?php }?>>1.25</option>
+                            <option <?php if($gradesStudent->grade==1.50){ ?> selected <?php }?>>1.50</option>
+                            <option <?php if($gradesStudent->grade==1.75){ ?> selected <?php }?>>1.75</option>
+                            <option <?php if($gradesStudent->grade==2.0){ ?> selected <?php }?>>2.00</option>
+                            <option <?php if($gradesStudent->grade==2.25){ ?> selected <?php }?>>2.25</option>
+                            <option <?php if($gradesStudent->grade==2.50){ ?> selected <?php }?>>2.50</option>
+                            <option <?php if($gradesStudent->grade==2.75){ ?> selected <?php }?>>2.75</option>
+                            <option <?php if($gradesStudent->grade==3.0){ ?> selected <?php }?>>3.00</option>
+                            <option <?php if($gradesStudent->grade==5.0){ ?> selected <?php }?>>5.00</option>
+                        </select></b></td>
                         <td class="text-center" ><b>{{$gradesStudent->remark}}</b></td>
-                        <td class="text-center" ><b></b></td>
+                        <td class="text-center" ><input type="submit" value="Edit" class="btn btn-info"> </td>
+                            </form>
                         </tr>
                         @endforeach   
                     </table>

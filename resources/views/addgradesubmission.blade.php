@@ -67,9 +67,9 @@
                                         <label>Subject</label>
                                         <select name="coursecode" required class="form-control w-100 form-control-broder border-secondary">
                                         <option value="">Select Course Code</option>
-                                        @foreach ($subjects as $subjects)
+                                        @foreach ($programs as $programs)
                                        
-                                            <option  value="{{$subjects->courseCode}}">{{$subjects->courseCode.'-'.$subjects->course}}</option>
+                                            <option  value="{{$programs->id}}">{{$programs->acc.'-'.$programs->program}}</option>
                                                 @endforeach   
                                     </select>
                                 
@@ -159,11 +159,11 @@
                                
                                     <?php }?></b></td>
                                     <td class="text-center" ><b>
-                                    <?php if($settings->status==""){ ?>
+                                    <?php if($Gradesubmissions->status==""){ ?>
                                         <h1 class="bg-warning">No grades uploaded yet</h1>
-                                        <?php }else if($settings->status=="Initial"){ ?>
+                                        <?php }else if($Gradesubmissions->status=="Initial"){ ?>
                                            
-                                            <h1 class="bg-secondary">Uploaded grades not yet published</h1>
+                                            <h1 class="bg-secondary">Initial grades uploaded but not yet published</h1>
                                        
                                             <?php }else{ ?>
                                                 <h1 class="bg-succes">Grades already published</h1>

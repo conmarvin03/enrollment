@@ -20,14 +20,15 @@ Route::middleware([
 
     Route::middleware([CheckRole::class . ':teacher'])->group(function () {
         Route::get('/addgradesubmission', [GradeController::class, 'index'])->name('addgradesubmission');
+        route::put('/grades/submission/{id}/edit',[GradeController::class,'editgrades'])->name('editgrades'); 
+        route::put('/grades/{Gradesubmissions}/update',[GradeController::class,'updategrades'])->name('updategrades');  
         route::post('/add-grades',[GradeController::class,'addgradesubmit'])->name('addgradesubmit');
         route::get('/grades/{Gradesubmissions}/edit',[GradeController::class,'gradesview'])->name('grades.edit');
        
-        route::put('/grades/{Gradesubmissions}/update',[GradeController::class,'updategrades'])->name('edit.grades');    
-       
-       
+        route::post('/import-grades', [GradeController::class, 'import'])->name('importGrades');
+      
+        
     });
-    Route::post('/import-excel', [GradeController::class, 'import'])->name('import.excel');
     
     Route::middleware([CheckRole::class . ':Student'])->group(function () {
         Route::get('/asd', [GradeController::class, 'index'])->name('addgradesubmission');

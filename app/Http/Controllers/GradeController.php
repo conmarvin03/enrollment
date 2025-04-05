@@ -16,6 +16,7 @@ use Exception;
 use App\Models\Logs;
 use Illuminate\Support\Facades\Auth;
 
+use App\Models\Programs;
 use Maatwebsite\Excel\Facades\Excel;
 class GradeController extends Controller
 {
@@ -24,10 +25,11 @@ class GradeController extends Controller
     public function index()
     {
         $subjects = Curriculums::where('status','=',NULL)->get();
+        $programs = Programs::get();
         $settings = settings::where('id','=',1)->get();
        
         $Gradesubmissions=Gradesubmissions::all();
-        return view('addgradesubmission',['subjects'=>$subjects,'settings'=>$settings,'Gradesubmissions'=>$Gradesubmissions]);
+        return view('addgradesubmission',['subjects'=>$subjects,'settings'=>$settings,'Gradesubmissions'=>$Gradesubmissions,'programs'=>$programs]);
     }
     public function addgradesubmit(Request $request)
     {
@@ -37,6 +39,7 @@ class GradeController extends Controller
             $newProduct=Gradesubmissions::create(['gradeName'=>$request->gName,
             'section'=>$request->section,
             'subject'=>$request->coursecode,  
+            'coursecode'=>'',  
             'semester'=>$request->semester,
             'year'=>$request->year,
             'tID'=>$request->tID,
@@ -57,24 +60,28 @@ class GradeController extends Controller
 
     public function import(Request $request)
     {
-
-      
         $request->validate([
             'file' => 'required|mimes:xlsx,csv'
         ]);
-
+    
         $id = $request->ids;
-        $user = Auth::user();
         $idsss = Auth::id();
-    Logs::create(['userid'=>$idsss,
-    'remarks'=> 'User ID '.$idsss.' import curriculum using excel with program id ( '.$request->ids.') in the system.'
-]);
-        Excel::import(new GradeImport($id), $request->file('file'));
-
-        return back()->with('success', 'Excel file imported successfully.');
-
+    
+        Logs::create([
+            'userid' => $idsss,
+            'remarks' => 'User ID ' . $idsss . ' imported grades using Excel with program ID ( ' . $id . ') in the system.'
+        ]);
+        try {
+            Excel::import(new GradeImport($id,$request->semester,$request->year,$request->section,$request->tID,$request->subject), $request->file('file'));
+    
+        // Retrieve newly imported records
+        $grades = Grades::where('tID', $idsss)->latest()->get();
+        return redirect()->back()->with('success', 'Grades imported successfully!');
+    } catch (\Exception $e) {
+        return redirect()->back()->with('error', $e->getMessage());
     }
-
+   
+    }
 
 
 
@@ -83,27 +90,56 @@ class GradeController extends Controller
         $gradesStudent=Grades::where('gsID','=',$id)->get();
         $gradessubmissions=Gradesubmissions::where('id','=',$id)->get();
         $settings = settings::where('id','=',1)->get();
-        $subjects = Curriculums::where('status','!=','archived')->get();
+        $pid = Gradesubmissions::where('id', $id)->value('subject');
+      
+        $subjects = Curriculums::where('pID', $pid)
+            ->whereNull('status') // better syntax for NULL
+            ->get();
         return view('viewgradesubmission',['subjects'=>$subjects,'settings'=>$settings,'gradesStudent'=>$gradesStudent,'gradessubmissions'=>$gradessubmissions]);
    
     }
     public function updategrades(Gradesubmissions $Gradesubmissions, Request $request)
     {
-        try{
-            $Gradesubmissions->update(['gradeName'=>$request->gName,
-            'section'=>$request->section,'subject'=>$request->coursecode]);
+
+        try{  
+            $Gradesubmissions->update(['gradeName'=>$request->gName,'section'=>$request->section,'coursecode'=>$request->coursecode]);
         
             $user = Auth::user();
             $idsss = Auth::id();
         Logs::create(['userid'=>$idsss,
-        'remarks'=> 'User ID '.$idsss.' update the submittedd grade named ( '.$Gradesubmissions->gName.') in the system.'
+        'remarks'=> 'User ID '.$idsss.' update the subasdasdmittedd grade named ( '.$Gradesubmissions->coursecode.') in the system.'
     ]);
-    
+    Grades::where('gsID',$request->id)->update(['subject'=>$request->coursecode]);
             return back()->with('success', 'Grade details edit Successfully!');
         } catch (Exception $e) {
             return response()->json(['error' => 'Error updating status'], 500);
       }
         
+    }
+    public function editgrades(Request $request,$id)
+    {
+        try
+        {
+
+            if($request->grade==5.0)
+            {
+                $asd="Failed";
+            }else{
+                $asd="Passed";
+            }
+            Grades::where('id', $id)->update([
+                'grade'=>$request->grade,
+                'remark'=>$asd
+            ]);
+            $user = Auth::user();
+            $idsss = Auth::id();
+        Logs::create(['userid'=>$idsss,
+        'remarks'=> 'User ID '.$idsss.' update the submitted grade in the system.'
+    ]);
+         return back()->with('success', 'Grade details edit Successfully!');
+        } catch (Exception $e) {
+            return response()->json(['error' => 'Error updating status'], 500);
+      }
     }
 
 }

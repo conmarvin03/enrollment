@@ -14,81 +14,81 @@ class StudentImport implements ToCollection, WithHeadingRow
 {
     public function collection(Collection $rows)
     {
-        $existingEmails = []; // Track emails within the Excel file
-        $skippedEmails = []; // Store skipped duplicate emails
+        $existingEntries = []; // Track kldnum and emails within the Excel file
+        $duplicateEntries = []; // Store duplicate kldnum or email
+        $importData = []; // Store valid data for import
 
+        // First pass: Check for duplicates within the file
         foreach ($rows as $row) {
-            try {
-                // Validate required fields
-                if (!isset($row['email'], $row['kldnum']) || empty(trim($row['email']))) {
-                    throw new Exception("Missing required fields: Email or kldnum is empty.");
-                }
+            $email = strtolower(trim($row['email'] ?? ''));
+            $kldnum = trim($row['kldnum'] ?? '');
 
-                $email = strtolower(trim($row['email']));
-                $kldnum = trim($row['kldnum']);
-
-                // Skip duplicate emails within the Excel file
-                if (in_array($email, $existingEmails)) {
-                    $skippedEmails[] = $email;
-                    continue; // Skip this record
-                }
-
-                // Add email to tracking array
-                $existingEmails[] = $email;
-
-                // Skip if email already exists in database
-                if (User::where('email', $email)->exists()) {
-                    $skippedEmails[] = $email;
-                    continue; // Skip this record
-                }
-
-                // Insert or update User
-                User::updateOrCreate(
-                    ['kldID' => $kldnum, 'email' => $email], // Find by kldID & email
-                    [
-                        'name' => trim($row['firstname']).' '.trim($row['middlename']).' '.trim($row['lastname']),
-                        'fName' => trim($row['firstname']),
-                        'lName' => trim($row['lastname']),
-                        'mName' => trim($row['middlename']),
-                        'email' => $email,
-                        'password' => Hash::make($kldnum . trim($row['lastname'])),
-                        'role' => 'Student',
-                        'pID' => trim($row['pid']),
-                        'kldID' => $kldnum,
-                        'img' => '',
-                        'gender' => trim($row['gender']),
-                        'bday' => trim($row['bday']),
-                        'address' => trim($row['address']),
-                    ]
-                );
-
-                // Insert or update Student record
-                Students::updateOrCreate(
-                    ['kldID' => $kldnum, 'email' => $email], // Find by kldID & email
-                    [
-                        'fName' => trim($row['firstname']),
-                        'lName' => trim($row['lastname']),
-                        'mName' => trim($row['middlename']),
-                        'email' => $email,
-                        'role' => 'Student',
-                        'pID' => trim($row['pid']),
-                        'kldID' => $kldnum,
-                        'img' => '',
-                        'gender' => trim($row['gender']),
-                        'bday' => trim($row['bday']),
-                        'address' => trim($row['address']),
-                    ]
-                );
-
-            } catch (Exception $e) {
-                // Log error but continue processing
-                $skippedEmails[] = $email;
+            if (empty($email) || empty($kldnum)) {
+                $duplicateEntries[] = ['kldnum' => $kldnum, 'email' => $email, 'reason' => 'Missing required fields'];
+                continue;
             }
+
+            if (isset($existingEntries[$email]) || isset($existingEntries[$kldnum])) {
+                $duplicateEntries[] = ['kldnum' => $kldnum, 'email' => $email, 'reason' => 'Duplicate entry within file'];
+                continue;
+            }
+
+            $existingEntries[$email] = true;
+            $existingEntries[$kldnum] = true;
+
+            // Collect valid data
+            $importData[] = $row;
         }
 
-        // Show message after import is completed
-        if (!empty($skippedEmails)) {
-            throw new Exception("Import completed, but some emails were skipped: " . implode(", ", $skippedEmails));
+        // If duplicates exist within the file, prevent import and return an error
+        if (!empty($duplicateEntries)) {
+            return back()->with('error', 'Import failed due to duplicate or invalid entries.')->with('details', $duplicateEntries);
         }
+
+        // Proceed with updating or creating records, skipping database duplicate check
+        foreach ($importData as $row) {
+            $email = strtolower(trim($row['email']));
+            $kldnum = trim($row['kldnum']);
+
+            // Update or create in User table
+            User::updateOrCreate(
+                ['kldID' => $kldnum, 'email' => $email],
+                [
+                    'name' => trim($row['firstname']).' '.trim($row['middlename']).' '.trim($row['lastname']),
+                    'fName' => trim($row['firstname']),
+                    'lName' => trim($row['lastname']),
+                    'mName' => trim($row['middlename']),
+                    'email' => $email,
+                    'password' => Hash::make($kldnum . trim($row['lastname'])),
+                    'role' => 'Student',
+                    'pID' => trim($row['pid']),
+                    'kldID' => $kldnum,
+                    'img' => '',
+                    'gender' => trim($row['gender']),
+                    'bday' => trim($row['bday']),
+                    'address' => trim($row['address']),
+                ]
+            );
+
+            // Update or create in Students table
+            Students::updateOrCreate(
+                ['kldID' => $kldnum, 'email' => $email],
+                [
+                    'fName' => trim($row['firstname']),
+                    'lName' => trim($row['lastname']),
+                    'mName' => trim($row['middlename']),
+                    'email' => $email,
+                    'role' => 'Student',
+                    'pID' => trim($row['pid']),
+                    'kldID' => $kldnum,
+                    'img' => '',
+                    'gender' => trim($row['gender']),
+                    'bday' => trim($row['bday']),
+                    'address' => trim($row['address']),
+                ]
+            );
+        }
+
+        return back()->with('success', 'Excel file imported and records updated successfully.');
     }
 }

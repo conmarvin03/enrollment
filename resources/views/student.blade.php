@@ -3,28 +3,28 @@
   </head>
 <x-app-layout>
     <x-slot name="header">
-        @if (session('success'))
+        @if (session('error'))
         <script>
-            Swal.fire({
-                icon: 'success',
-                title: 'Success!',
-                text: '{{ session('success') }}',
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-            });
-        </script>
-    @endif
-    @if (session('error'))
-        <script>
+            let duplicateDetails = @json(session('details'));
+            let errorMessage = "Import failed due to duplicate or invalid entries.";
+        
+            if (duplicateDetails && duplicateDetails.length > 0) {
+                errorMessage += "\n\nDuplicate Entries:\n";
+                duplicateDetails.forEach(entry => {
+                    errorMessage += `KLDNum: ${entry.kldnum || 'N/A'}, Email: ${entry.email || 'N/A'} - ${entry.reason}\n`;
+                });
+            }
+        
             Swal.fire({
                 icon: 'error',
                 title: 'Oops...',
-                text: '{{ session('error') }}',
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
+                text: errorMessage,
+                confirmButtonText: 'OK'
             });
         </script>
     @endif
+ 
+    
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
            
