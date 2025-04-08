@@ -71,135 +71,16 @@
                   cursor: help;
                 }
               </style>
-              @php
-              $prereqs = DB::table('prereqs as p')
-                  ->join('curriculums as c1', 'p.courseCode', '=', 'c1.id')
-                  ->join('curriculums as c2', 'p.preReq', '=', 'c2.id')
-                  ->select('c1.courseCode as course', 'c2.courseCode as prerequisite')
-                  ->where('p.pID', '=', $program->id)
-                  ->get();
-              @endphp
-              <script src="https://cdn.jsdelivr.net/npm/leader-line-new/leader-line.min.js"></script>
-              
-              @php
-                $maxYear = $curriculum->max('years');
-              @endphp
-              
-              <div class="row">
-                @for ($year = 1; $year <= $maxYear; $year++)
-                  @php
-                    $yearSubjects = $curriculum->where('years', $year);
-                  @endphp
-              
-                  @if ($yearSubjects->count())
-                    <div class="col">
-                      <div class="year-header">Year {{ $year }}</div>
-                      <div class="row">
-                        @foreach ([1 => '1st Semester', 2 => '2nd Semester', 3 => 'Summer'] as $sem => $semLabel)
-                          @php
-                            $semesterSubjects = $yearSubjects->where('semester', $sem);
-                          @endphp
-              
-                          @if ($semesterSubjects->count())
-                            <div class="col">
-                              <div class="semester-label">{{ $semLabel }}</div>
-              
-                              @foreach ($semesterSubjects as $subject)
-                                @php
-                                  $type = strtolower($subject->type);
-                                  $color = match($type) {
-                                      'general education' => '#bbdefb',
-                                      'professional course' => '#c8e6c9',
-                                      'core course' => '#e1bee7',
-                                      default => '#f5f5f5',
-                                  };
-                                  $border = match($type) {
-                                      'general education' => '#1976d2',
-                                      'professional course' => '#388e3c',
-                                      'core course', 'lecture/laboratory', 'lab/lec' => '#8e24aa',
-                                      default => '#757575',
-                                  };
-                                @endphp
-                                <div
-                                  class="subject"
-                                 id="subject-{{ $subject->courseCode }}"
-                                  style="background-color: {{ $color }}; border-left: 5px solid {{ $border }};"
-                                  title="{{ $subject->course }}"
-                                >
-                                  <strong>{{ $subject->courseCode }}</strong><br>
-                                  <small>{{ $subject->leclab }} • {{ $subject->unit }} Unit{{ $subject->unit > 1 ? 's' : '' }}</small>
-                                </div>
-                              @endforeach
-                            </div>
-                          @endif
-                        @endforeach
-                      </div>
-                    </div>
-                  @endif
-                @endfor
-              </div>
-              
-              <script src="https://cdn.jsdelivr.net/npm/leader-line-new/leader-line.min.js"></script>
-             <script src="https://cdn.jsdelivr.net/npm/leader-line-new/leader-line.min.js"></script>
+        
 
-<script>
-  document.addEventListener("DOMContentLoaded", () => {
-    const prerequisites = @json($prereqs);
+      
 
-    const getColor = (type, inCount, outCount) => {
-      // Prioritize color override based on multiple connections
-      if ((inCount > 1 || outCount > 1)) return '#ff9800'; // Orange for multi-connect
-      switch (type?.toLowerCase()) {
-        case 'general education': return '#1976d2'; // Blue
-        case 'professional course': return '#388e3c'; // Green
-        case 'core course':
-        case 'lecture/laboratory':
-        case 'lab/lec': return '#8e24aa'; // Purple
-        default: return '#757575'; // Gray
-      }
-    };
-
-    // Count connections
-    const inMap = {};
-    const outMap = {};
-    prerequisites.forEach(pr => {
-      inMap[pr.course] = (inMap[pr.course] || 0) + 1;
-      outMap[pr.prerequisite] = (outMap[pr.prerequisite] || 0) + 1;
-    });
-
-    prerequisites.forEach(pr => {
-      const from = document.getElementById(`subject-${pr.course}`);
-      const to = document.getElementById(`subject-${pr.prerequisite}`);
-
-      if (from && to) {
-        const type = to.getAttribute("title-type") || '';
-        const inCount = inMap[pr.course] || 0;
-        const outCount = outMap[pr.prerequisite] || 0;
-
-        new LeaderLine(
-          from,
-          to,
-          {
-            color: 'gray',
-            path: 'straight',
-            startSocket: 'right',
-            endSocket: 'left',
-            startPlug: 'disc',
-            endPlug: 'arrow1',
-            size: 2,
-            dash: { animation: true }
-          }
-        );
-      }
-    });
-  });
-</script>
                         </div>
              
                           </div>
-
+                         {{ $id->kldID }}
                       </div>
-    
+   
                 </div>
 
             </div>

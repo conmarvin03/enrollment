@@ -24,12 +24,94 @@ class StudentController extends Controller
         $programs=Programs::all();
         return view('student',['students'=>$students,'programs'=>$programs]);
     }
-    public function viewGrades()
+    public function viewGrades($id)
 {
-    
-    
-    return view('viewgrades');
+         
+        $program=Students::where('kldID','=',$id)->get();
+        return view('viewgrades',['id'=>$program]
+        );
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        // $noofcourses = Curriculums::where('pID', '=', $program->id)->count();
+        // $countlecture = Curriculums::where('pID', '=', $program->id)->where('leclab', '=', 'Lecture')->count();
+        // $countlaboratory = Curriculums::where('pID', '=', $program->id)->where('leclab', '=', 'Laboratory')->count();
+        // $sumUnits = Curriculums::where('pID', '=', $program->id)->sum('Unit');
+        // $subjects = Curriculums::where('pID', $program->id)->get();
+        
+        // $programs = Programs::findOrFail($program->id);
+    
+        // // Fetch prerequisite relationships
+        // $prereqs = DB::table('prereqs as p')
+        //     ->join('curriculums as c1', 'p.courseCode', '=', 'c1.id')
+        //     ->join('curriculums as c2', 'p.preReq', '=', 'c2.id')
+        //     ->select('c1.courseCode as course', 'c2.courseCode as prerequisite')
+        //     ->where('p.pID', '=', $program->id)
+        //     ->get();
+    
+        //     $nodeDataArray = $subjects->map(function ($subject) {
+        //         // Assign colors based on subject type
+        //         $color = match($subject->type) {
+        //             'Core' => 'red',
+        //             'Elective' => 'blue',
+        //             'General' => 'green',
+        //             default => 'gray'
+        //         };
+            
+        //         return [
+        //             'key' => $subject->courseCode,
+        //             'courseCode' => $subject->courseCode,
+        //             'type' => $subject->type,
+        //             'semester' => $subject->semester,
+        //             'year' => $subject->years,
+        //             'color' => $color
+        //         ];
+        //     });
+            
+        //     $linkDataArray = $prereqs->map(function ($prereq) {
+        //         return [
+        //             'from' => $prereq->prerequisite,
+        //             'to' => $prereq->course
+        //         ];
+        //     });
+    
+        // $pp = DB::table('prereqs as cp')
+        //     ->join('curriculums as c1', 'cp.courseCode', '=', 'c1.id')
+        //     ->join('curriculums as c2', 'cp.preReq', '=', 'c2.id')
+        //     ->select('cp.id', 'c1.courseCode as course', 'c1.course as course1', 'c2.courseCode as prerequisite', 'c2.course as prerequisite1')
+        //     ->where('cp.pID', '=', $program->id)
+        //     ->get();
+    
+        // $curriculum = Curriculums::where('pID', '=', $program->id)->get();
+    
+        // return view('curriculum', compact(
+        //     'nodeDataArray',
+        //     'linkDataArray',
+        //     'programs',
+        //     'program',
+        //     'curriculum',
+        //     'countlecture',
+        //     'countlaboratory',
+        //     'sumUnits',
+        //     'noofcourses',
+        //     'pp'
+        // ));
+    
     }
     public function create()
     {
