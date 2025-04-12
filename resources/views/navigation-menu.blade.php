@@ -20,12 +20,16 @@ use Illuminate\Support\Facades\Auth; ?>
                 </div> <?php if(Auth::user()->role=="teacher"){?>
 
                     <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                            <x-nav-link href="{{ route('addgradesubmission') }}" :active="request()->routeIs('Grades')">
+                            <x-nav-link href="{{ route('addgradesubmission') }}" :active="request()->routeIs('addgradesubmission')">
                                 {{ __('Grades') }}
                             </x-nav-link>
                         </div>
                 <?php }else if(Auth::user()->role=="Student"){?> 
-                        
+                    <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
+                        <x-nav-link href="{{ route('show.grades') }}" :active="request()->routeIs('show.grades')">
+                            {{ __('Grades') }}
+                        </x-nav-link>
+                    </div>
                     <?php }else{?>
                         <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
                             <x-nav-link href="{{ route('users.create') }}" :active="request()->routeIs('Admins')">
@@ -50,8 +54,12 @@ use Illuminate\Support\Facades\Auth; ?>
                     </x-nav-link> 
                    
                 </div>
-                
-        
+                <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
+                  
+                    <x-nav-link href="{{ route('admingrade') }}" :active="request()->routeIs('admingrade')">
+                        {{ __('Grades') }}
+                    </x-nav-link>
+                    </div>
                 <?php }?>
                 </div>      
                  <div class="hidden sm:flex sm:items-center sm:ms-6">

@@ -60,25 +60,62 @@
                                         <input type="text" class="form-control w-100 border-secondary" name="gName" required placeholder="Enter First Name">
                                     </div>
                                     <div class="col-4">
-                                        <label>Section Format Eg. (BSIS114)</label>
+                                        <div class="row">
+                                            <div class="col">
+                                        <label>Section</label>
                                         <input type="text" class="form-control w-100 border-secondary" name="section" required placeholder="Enter Last Name">
+                                            </div>
+                                            <div class="col">
+                                                <label>Program</label>
+                                                <select name="program" id="programDropdown" required class="form-control border-secondary">
+                                                    <option value="">Select Program</option>
+                                                    @foreach ($programs as $program)
+                                                        <option value="{{ $program->id }}">{{ $program->acc . '-' . $program->program }}</option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+                                        </div>
                                     </div>
                                     <div class="col-4">
-                                        <label>Subject</label>
-                                        <select name="coursecode" required class="form-control w-100 form-control-broder border-secondary">
-                                        <option value="">Select Course Code</option>
-                                        @foreach ($programs as $programs)
-                                       
-                                            <option  value="{{$programs->id}}">{{$programs->acc.'-'.$programs->program}}</option>
-                                                @endforeach   
-                                    </select>
+                                        
+                                        <label>Course</label>
+                                        <select name="coursecode" id="courseDropdown" required class="form-control border-secondary">
+                                            <option value="">Select Course</option>
+                                        </select>
+
+                                </div>
+                                <div class="col-4 mt-2">
+                                    <label>Room</label>
+                                    <input type="text" class="form-control w-100 border-secondary" name="room" required placeholder="Enter room">
+                                </div>
                                 
+                                <div class="col-4 mt-2">
+                                    <label>Time Start</label>
+                                    <input type="text" class="form-control w-100 border-secondary" name="timestart" required placeholder="Time Start">
+                                </div>
+                                
+                                <div class="col-4 mt-2">
+                                    <label>Time End</label>
+                                    <input type="text" class="form-control w-100 border-secondary" name="timeend" required placeholder="Time End">
                                 </div>
                                 </div>
                                 <div class="row">
-                                    <div class="col-4">  @foreach ($settings as $settings)
-                            <label class="mt-1">Academic year:</label> <h1>{{ $settings->academicyear }} - {{ $settings->year }}</h1>
-                            <input type="text" class="form-control w-100 border-secondary" name="year" style="display:none;" value="{{$settings->academicyear.'-'.$settings->year}}" required placeholder="Enter KLD ID No.">  
+                                
+                        <div class="col-4">
+                            <label>Day</label>
+                            <select class="form-control w-100 border-secondary"  required name="day">
+                                <option value="">Select Day</option>
+                                <option>Monday</option>
+                                <option>Tuesday</option>
+                                <option>Wednesday</option>
+                                <option>Thursday</option>
+                                <option>Friday</option>
+                                <option>Saturday</option>
+                                <option>Sunday</option>
+                            </select>
+                        </div>    <div class="col-4">  @foreach ($settings as $settings)
+                            <label class="mt-1">Academic year:</label> <h1>{{ $settings->year }}</h1>
+                            <input type="text" class="form-control w-100 border-secondary" name="year" style="display:none;" value="{{$settings->year}}" required placeholder="Enter KLD ID No.">  
                         </div>
                         <div class="col-4">
                             <label class="mt-1">Semester:</label>
@@ -107,7 +144,7 @@
                            
                                 </div>  @endforeach   
                                 <div class="col-4">
-                           <button type="submit" class="btn btn-outline-success mt-2" style="float: right;"><i class="fa-solid fa-plus"></i> Add Student</button>
+                           <button type="submit" class="btn btn-outline-success mt-2" style="float: right;"><i class="fa-solid fa-plus"></i> Add Schedule</button>
                                 </div></div>
                                 
                         </div>
@@ -131,13 +168,16 @@
                     <table  id="example"  class="table-responsive text-center display table table-striped table-hover table-bordered border-success" >
                         <thead class="text-center">
                          <tr>
-                            <th class="text-center">GSID</th>
+                            <th class="text-center">ID</th>
                             <th class="text-center" >Grade Name</th>
-                            <th class="text-center">Subject</th>
-                            <th class="text-center">Section</th>
-                            <th class="text-center">Year</th>
+                            <th class="text-center">Course</th>
+                            <th class="text-center">Program</th>
+                            <th class="text-center">Year and Section</th>
+                            <th class="text-center">Day</th>
+                            <th class="text-center">Time</th>
+                            <th class="text-center">Room</th>
                             <th class="text-center">Semester</th>
-                            <th class="text-center">Status</th>
+                            <th class="text-center">Remarks</th>
                             <th class="text-center">Action</th>
                          </tr>
                         </thead>
@@ -146,34 +186,42 @@
                         <tr>
                         <td class="text-center" ><b>{{$Gradesubmissions->id}}</b></td>
                         <td class="text-center" ><b>{{$Gradesubmissions->gradeName}}</b></td>
-                    <td class="text-center" ><b>{{$Gradesubmissions->subject}}</b></td>
-                    <td class="text-center" ><b>{{$Gradesubmissions->section}}</b></td>
-                    <td class="text-center" ><b>{{$Gradesubmissions->year}}</b></td>
-                    <td class="text-center" ><b>   <?php if($settings->semester==1){ ?>
+                        <td class="text-center" ><b>{{$Gradesubmissions->coursecode}}</b></td>
+                        <td class="text-center" ><b>{{ $Gradesubmissions->acc}}</b></td>
+                        <td class="text-center" ><b>{{$Gradesubmissions->year.' - '.$Gradesubmissions->section}}</b></td>
+                    <td class="text-center" ><b>{{$Gradesubmissions->day}}</b></td>
+                    <td class="text-center" ><b>{{$Gradesubmissions->timestart.' - '.$Gradesubmissions->timeend}}</b></td>
+                    <td class="text-center" ><b>{{$Gradesubmissions->room}}</b></td>
+                    <td class="text-center" ><b>   <?php if($Gradesubmissions->semester==1){ ?>
                                 <h1>1st Semester</h1>
-                                <?php }else if($settings->semester==2){ ?> 
+                                <?php }else if($Gradesubmissions->semester==2){ ?> 
                                     <h1>2nd Semester</h1>
                                
-                                <?php }else if($settings->semester==3) {  ?>
+                                <?php }else if($Gradesubmissions->semester==3) {  ?>
                                     <h1>Summer</h1>
                                
                                     <?php }?></b></td>
                                     <td class="text-center" ><b>
                                     <?php if($Gradesubmissions->status==""){ ?>
                                         <h1 class="bg-warning">No grades uploaded yet</h1>
+                                    </b></td>
+                                    <td><a class="navbar-brand text-dark btn btn-outline-secondary" href="{{route('grades.edit',['Gradesubmissions'=> $Gradesubmissions])}}"><i class="fa-regular fa-pen-to-square"></i> Edit</a>
+                                    </td>
                                         <?php }else if($Gradesubmissions->status=="Initial"){ ?>
                                            
                                             <h1 class="bg-secondary">Initial grades uploaded but not yet published</h1>
-                                       
+                                        </b></td>
+                                        <td><a class="navbar-brand text-dark btn btn-outline-secondary" href="{{route('grades.edit',['Gradesubmissions'=> $Gradesubmissions])}}"><i class="fa-regular fa-pen-to-square"></i> Edit</a>
+                                        </td>
                                             <?php }else{ ?>
-                                                <h1 class="bg-succes">Grades already published</h1>
-                                       
+                                                <h1 class="bg-success">Grades already published</h1>
+                                            </b></td>
+                                            <td><a class="navbar-brand text-dark btn btn-outline-secondary disabled"   href="{{route('grades.edit',['Gradesubmissions'=> $Gradesubmissions])}}"><i class="fa-regular fa-pen-to-square"></i> Edit</a>
+                                            </td>
                                               
                                                 <?php }?>
                                   
-                                    </b></td>
-                    <td><a class="navbar-brand text-dark btn btn-outline-secondary" href="{{route('grades.edit',['Gradesubmissions'=> $Gradesubmissions])}}"><i class="fa-regular fa-pen-to-square"></i> Edit</a>
-                    </td>
+                  
 
                 </tr>
                         @endforeach   
@@ -192,7 +240,30 @@
 </x-app-layout>
 
       
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $('#programDropdown').on('change', function () {
+        var programId = $(this).val();
+        $('#courseDropdown').empty().append('<option value="">Loading...</option>');
 
+        if (programId) {
+            $.ajax({
+                url: '{{ url("/get-subjects-by-program") }}/' + programId,
+                type: 'GET',
+                success: function (data) {
+                    $('#courseDropdown').empty().append('<option value="">Select Course</option>');
+                    $.each(data, function (index, subject) {
+                        $('#courseDropdown').append(
+                            '<option value="' + subject.courseCode + '">' + subject.courseCode + ' - ' + subject.course + '</option>'
+                        );
+                    });
+                }
+            });
+        } else {
+            $('#courseDropdown').html('<option value="">Select Course</option>');
+        }
+    });
+</script>
 <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.datatables.net/2.0.5/js/dataTables.js"></script>
@@ -204,12 +275,14 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
 <script src="https://cdn.datatables.net/buttons/3.0.2/js/buttons.html5.min.js"></script>
 <script>
-   new DataTable('#example', {
-layout: {
-    topStart: {
-     
-    }
-}
-});
+    new DataTable('#example', {
+        order: [[0, 'desc']],  // This will order the first column (index 0) in descending order by default
+        layout: {
+            topStart: {
+                // Add any additional layout customizations if needed
+            }
+        }
+    });
 </script>
+
 

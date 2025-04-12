@@ -12,8 +12,10 @@ use App\Models\Students;
 
 use App\Actions\Fortify\CreateNewUser;
 use App\Imports\StudentImport;
+use App\Models\Grades;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
+use Illuminate\Support\Facades\Auth;
 class StudentController extends Controller
 {
     public function index()
@@ -24,11 +26,21 @@ class StudentController extends Controller
         $programs=Programs::all();
         return view('student',['students'=>$students,'programs'=>$programs]);
     }
+    public function showGrades()
+{         $user = Auth::user();
+          $idsss = Auth::id();
+
+         $grades=Grades::where('kldID','=',Auth::user()->kldID)->where('status','=','Published')->get();
+        $id=Students::where('kldID','=',Auth::user()->kldID)->get();
+        return view('viewgradesstudent',['id'=>$id,'grades'=>$grades]
+        );
+
+    }
     public function viewGrades($id)
 {
-         
+         $grades=Grades::where('kldID','=',$id)->where('status','=','Published')->get();
         $program=Students::where('kldID','=',$id)->get();
-        return view('viewgrades',['id'=>$program]
+        return view('viewgrades',['id'=>$program,'grades'=>$grades]
         );
 
 
@@ -192,10 +204,9 @@ class StudentController extends Controller
         'address'=>NULL
     ]);
 
-           
-    return redirect(route('students'))->with('success', 'Students Added Successfully!');
+    return back()->with('successs', 'Students Added Successfully!');
 } catch (Exception $e) {
-    return redirect(route('students'))->with('error', 'Error adding students! Email must be unique!');
+    return back()->with('errors', 'Error adding students! Email must be unique!');
 }
 
     }

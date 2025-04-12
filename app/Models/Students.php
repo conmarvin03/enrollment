@@ -17,6 +17,6 @@ class Students extends Model
         'bday',
         'email',
         'address',
-        'img'
+        'img','ay','section'
     ];
 }

@@ -23,7 +23,28 @@
             });
         </script>
     @endif
- 
+    @if (session('success'))
+    <script>
+        Swal.fire({
+            icon: 'success',
+            title: 'Success!',
+            text: '{{ session('success') }}',
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+        });
+    </script>
+@endif
+@if (session('errors'))
+    <script>
+        Swal.fire({
+            icon: 'error',
+            title: 'Oops...',
+            text: '{{ session('error') }}',
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+        });
+    </script>
+@endif
     
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
@@ -40,7 +61,7 @@
                     <form action="{{ route('import.excelStudent') }}" method="POST" enctype="multipart/form-data">
                         @csrf
                        <button type="submit" class="btn btn-dark" style="float: right;">Import Excel</button>  <h2 class="lead p-3">Import Excel</h2> <hr class=" w-100">
-                  
+                
                     <input type="file"  class="p-3"  class="form-control" name="file" required><br>
                   
                                    </form> 
@@ -125,8 +146,8 @@
                     <table  id="example"  class="table-responsive text-center display table table-striped table-hover table-bordered border-success" >
                         <thead class="text-center">
                          <tr>
-                            <th class="text-center">ID</th>
-                            <th class="text-center" width="5">Name</th>
+                            <th class="text-center">KLD ID</th>
+                            <th class="text-center">Name</th>
                             <th class="text-center">Email</th>
                             <th class="text-center">Program</th>
                             <th class="text-center">Action</th>
@@ -135,13 +156,13 @@
                         <tbody>
                             @foreach ($students as $students)
                             <tr>
-                                <td class="text-center" >{{$students->id}}</td>
+                                <td class="text-center" >{{$students->kldID}}</td>
                                 <td class="text-center" >{{$students->name}}</td>
                                 <td class="text-center" >{{$students->email}}</td>
                                 <td class="text-center" >{{$students->program}}</td>
-                                <td><a class="navbar-brand text-dark btn btn-primary" href="{{route('student.edit',['id'=> $students->kldID])}}"><i class="fa-regular fa-pen-to-square"></i> Edit</a>
+                                <td><a class="navbar-brand text-dark btn btn-sm btn-primary " href="{{route('student.edit',['id'=> $students->kldID])}}"><i class="fa-solid fa-pencil text-light"></i></a>
         </form>
-                                    <a class="navbar-brand text-dark btn btn-warning" href="{{route('viewGrades',['id'=> $students->kldID])}}"><i class="fa-regular fa-pen-to-square"></i> View Grades</a>
+                                    <a class="navbar-brand text-dark btn btn-sm btn-warning" href="{{route('viewGrades',['id'=> $students->kldID])}}"><i class="fa-solid fa-table text-light"></i></a>
                                 </td>
             
                             </tr>

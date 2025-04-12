@@ -29,78 +29,50 @@ class GradeImport implements ToCollection, WithHeadingRow
         $this->subject = $subject;
     }
     public function collection(Collection $rows)
-    {
-        $seenKldIDs = [];
+    {$seenKldIDs = [];
         $errors = [];
-    
-        // 🧹 STEP 1: Delete current grades for this gsID only
-        Grades::where('gsID', $this->ids)->delete();
-    
+        
         foreach ($rows as $row) {
             $kldID = $row['kldid'];
             $grade = $row['grade'];
             $inputRemark = strtolower(trim($row['remark']));
-    
-            // 🔁 STEP 2: Prevent duplicate rows in the uploaded file
+        
+            // 🔁 Prevent duplicate rows in the uploaded file
             if (in_array($kldID, $seenKldIDs)) {
                 $errors[] = "Duplicate KLD Number in file: " . $kldID;
                 continue;
             }
             $seenKldIDs[] = $kldID;
-    
-            // 🔍 STEP 3: Check if student exists
+        
+            // 🔍 Check if student exists
             $student = Students::where('kldID', $kldID)->first();
             if (!$student) {
                 $errors[] = "No student found for KLD Number: " . $kldID;
                 continue;
             }
-    
-            $studentName = $student->fName . ' ' . $student->mName . ' ' . $student->lName;
-    
-            // 🔒 STEP 4: Check existing grades (excluding current gsID)
-            $existingOther = Grades::where('kldID', $kldID)
-                ->where('subject', $this->subject)
-                ->where('gsID', '!=', $this->ids)
-                ->orderByDesc('id')
-                ->first();
-    
-            if ($existingOther) {
-                $existingRemark = strtolower($existingOther->remark);
-    
-                if ($existingRemark === 'passed') {
-                    // ❌ Don't allow import if student already passed in another gsID
-                    $errors[] = "KLD Number {$kldID} already passed this subject under a different record. Import skipped.";
-                    continue;
-                }
-            }
-    
-            // ✅ STEP 5: Determine new remark
+        
+            // ✅ Determine remark based on grade
             $remarks = ($grade == 5.0) ? "Failed" : "Passed";
-    
-            // 💾 STEP 6: Save new grade
-            Grades::create([
-                'kldID' => $kldID,
-                'gsID' => $this->ids,
-                'grade' => $grade,
-                'remark' => $remarks,
-                'name' => $studentName,
-                'tID' => $this->tID,
-                'subject' => $this->subject,
-                'semester' => $this->semester,
-                'year' => $this->year,
-                'section' => $this->section,
-                'status' => ""
-            ]);
+        
+            // 💾 Update the grade if matching record exists
+            Grades::where('kldID', $kldID)
+                ->where('subject', $this->subject)
+                ->where('year', $this->year)
+                ->where('section', $this->section)
+                ->where('tID', $this->tID)
+                ->update([
+                    'grade' => $grade,
+                    'remark' => $remarks,
+                    'status' => ''
+                ]);
         }
-    
-        // ✅ STEP 7: Update submission status
+        
+        // ✅ Update the submission status
         Gradesubmissions::where('id', $this->ids)->update(['status' => 'Initial']);
-    
-        // ⚠️ STEP 8: Show all error messages via SweetAlert
+        
+        // ⚠️ Show errors if there are any
         if (!empty($errors)) {
             throw new \Exception(implode("\n", $errors));
         }
-    }
-    
-    
+    }        
 }

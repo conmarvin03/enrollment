@@ -38,7 +38,7 @@ class User extends Authenticatable
         'img',
         'gender',
         'bday',
-        'address'
+        'address','ay','section'
         ,'img'
     ];
 

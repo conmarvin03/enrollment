@@ -6,6 +6,8 @@ use Exception;
 use Illuminate\Support\Facades\Hash;
 use App\Models\User;
 use App\Models\Students;
+use App\Models\Curriculums;
+use App\Models\Grades;
 use Maatwebsite\Excel\Concerns\ToCollection;
 use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
@@ -67,6 +69,8 @@ class StudentImport implements ToCollection, WithHeadingRow
                     'gender' => trim($row['gender']),
                     'bday' => trim($row['bday']),
                     'address' => trim($row['address']),
+                    'ay' => trim($row['ay']),
+                    'section' => trim($row['section'])
                 ]
             );
 
@@ -85,10 +89,40 @@ class StudentImport implements ToCollection, WithHeadingRow
                     'gender' => trim($row['gender']),
                     'bday' => trim($row['bday']),
                     'address' => trim($row['address']),
+                    'ay' => trim($row['ay']),
+                    'section' => trim($row['section'])
+                ]
+            );
+
+
+            $firstSemSubjects = Curriculums::where('pID', $row['pid'])
+            ->where('years', 1)
+            ->where('semester', 1)
+            ->get();
+        
+        foreach ($firstSemSubjects as $subject) {
+            Grades::firstOrCreate(
+                [
+                    'kldID' => $kldnum,
+                    'subject' => $subject->courseCode,
+                    'semester' => 1,
+                    'year' => $row['ay'], // include year to avoid duplicates per year
+                    'section' => trim($row['section']),
+                ],
+                [
+                    'pID' => $row['pid'],
+                    'grade' => 0,
+                    'tID' => 0,
+                    'gsID' => $row['pid'],
+                    'remark' => '--',
+                    'status' => '',
+                    'name' => ''
                 ]
             );
         }
 
-        return back()->with('success', 'Excel file imported and records updated successfully.');
-    }
+        }
+      
+    return back()->with('success', 'Excel file imported and records updated successfully.');
+}
 }

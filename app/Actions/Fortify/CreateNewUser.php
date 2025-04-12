@@ -39,6 +39,8 @@ class CreateNewUser implements CreatesNewUsers
             'address' =>'',
             'gender' =>'',
             'bday' =>'',
+            'ay'=>'',
+            'section'=>'',
             'password' => Hash::make($input['password']),
         ]);
     }
@@ -64,7 +66,7 @@ class CreateNewUser implements CreatesNewUsers
             'img' =>'',
             'address' =>'',
             'gender' =>'',
-            'bday' =>'',
+            'bday' =>'','ay'=>'','section'=>'',
             'password' => Hash::make($input['password']),
         ]);
     }

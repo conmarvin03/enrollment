@@ -19,25 +19,36 @@ Route::middleware([
 ])->group(function () {
 
     Route::middleware([CheckRole::class . ':teacher'])->group(function () {
-        Route::get('/addgradesubmission', [GradeController::class, 'index'])->name('addgradesubmission');
-        route::put('/grades/submission/{id}/edit',[GradeController::class,'editgrades'])->name('editgrades'); 
+    
+        Route::get('/get-subjects-by-program/{programId}', [GradeController::class, 'getSubjectsByProgram']);
+        Route::get('/grades', [GradeController::class, 'index'])->name('addgradesubmission');
+       
+        route::put('/submission/{id}/edit',[GradeController::class,'editgrades'])->name('editgrades'); 
         route::put('/grades/{Gradesubmissions}/update',[GradeController::class,'updategrades'])->name('updategrades');  
         route::post('/add-grades',[GradeController::class,'addgradesubmit'])->name('addgradesubmit');
-        route::get('/grades/{Gradesubmissions}/edit',[GradeController::class,'gradesview'])->name('grades.edit');
-       
         route::post('/import-grades', [GradeController::class, 'import'])->name('importGrades');
       
+        
+        route::get('/grades/{Gradesubmissions}/edit',[GradeController::class,'gradesview'])->name('grades.edit');
+        Route::put('/editgrades/bulk/{id}', [GradeController::class, 'bulkEdit'])->name('editgrades.bulk');
+
+
+       
+        
         
     });
     
     Route::middleware([CheckRole::class . ':Student'])->group(function () {
-        Route::get('/asd', [GradeController::class, 'index'])->name('addgradesubmission');
+        // Route::get('/asd', [GradeController::class, 'index'])->name('addgradesubmission');
     
+        route::get('/show-grades',[StudentController::class,'showGrades'])->name('show.grades');
+        
        
     });
 
     Route::middleware([CheckRole::class . ':'])->group(function () {
-        Route::get('/addgradesubmission', [GradeController::class, 'index'])->name('addgradesubmission');
+        Route::put('/admingrades/edit-all', [GradeController::class, 'adminbulkEdit'])->name('admingrades.bulk');
+        Route::get('/grade/admin', [GradeController::class, 'geditadmin'])->name('admingrade');
     
         Route::get('/programs',[ProgramController::class,'index'])->name('programs');
         route::post('/addprograms',[ProgramController::class,'addprogram'])->name('addprograms');
@@ -49,6 +60,7 @@ Route::middleware([
         route::put('/course/{curriculum}/update',[ProgramController::class,'updatecourse'])->name('updatecourse');    
     
     
+       
         route::put('/curriculum/{curriculum}/update',[ProgramController::class,'updateStatus'])->name('updateStatus');
     
     // add prereq
@@ -81,12 +93,7 @@ Route::middleware([
     
     });
    
-    
-    Route::get('/grades', [GradeController::class, 'index'])->name('addgradesubmission');
-   
-    
-    
-    
+  
 
     route::get('/dashboard',[CurriculumController::class,'index'])->name('dashboard');
 });
