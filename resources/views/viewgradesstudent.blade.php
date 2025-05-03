@@ -73,21 +73,49 @@
               </style>
         
 
-        <a href="{{route('students')}}" style="float: right;" class="btn btn-outline-primary">go back</a>
                       
 
                         </div>
              
                           </div>
                           @foreach ($id as $id)
-                         {{ $id->kldID }}
-                         @endforeach   
+                          {{ $id->kldID }}
+                          @endforeach   
+                      
+                          <table   class="table-responsive text-center display table table-bordered border-success" >
+                            
+                            <thead class="text-center">
+                                                                <tr>
+                                                                    <th class="text-center">Code</th>
+                                                                    <th class="text-center">Course</th>
+                                <th class="text-center" >Grade</th>
+                                <th class="text-center" >Remarks</th>
+                                <th class="text-center">Teacher</th>
+                
+                                </tr>
+                            </thead>
+                            <tbody>          <?php  $count =0; $year=''; $sem='';?>      
+                                @foreach ($grades as $grades)
+                              
+                                    <?php 
+                                    if(($grades->year != $year || $year=='' )&&($grades->semester!=$sem ||$sem==''))
+                                    {
+                                     ?>
+                                        <tr><td style="text-align: right;" colspan="4"><b>Year: {{$grades->year}} - <?php if($grades->semester==1) {?>{{$grades->semester}}st Semester<?php }else if($grades->semester==2){?> {{$grades->semester}}nd Semester <?php }else{?> Summer <?php } ?></b></td></tr>
+                                    <?php
+                                    }
+                                    ?>  <tr>
+                         <?php $year=$grades->year; $sem=$grades->semester ?>
 
-
-                         @foreach ($grades as $grades)
-                         {{ $grades->subject.'-'.$grades->grade }}
-                         <br>
-                         @endforeach   
+                                    <td class="text-left" >  {{ $grades->subject }}  </td> <td  class="text-left" width="650">{{ $grades->course }}</td>
+                                    <td class="text-left" >{{number_format($grades->grade,2)}}</td>
+                                    <td class="text-left" >  {{ $grades->remark }}</td>
+                                    <td class="text-left" >  {{ $grades->teacher_name }}</td>
+                            
+                                </tr>
+                            @endforeach
+                            </tbody>
+                            </table>
                       </div>
    
                 </div>

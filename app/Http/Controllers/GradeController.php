@@ -30,11 +30,19 @@ class GradeController extends Controller
         $user = Auth::user();
         $idsss = Auth::id();
         
-        $Gradesubmissions = Gradesubmissions::join('programs', 'gradesubmissions.subject', '=', 'programs.id')
+        $Gradesubmissions = Gradesubmissions::join('programs', 'gradesubmissions.gsID', '=', 'programs.id')
     ->where('gradesubmissions.tID', $idsss)
     ->orderBy('gradesubmissions.id', 'DESC')
     ->select('gradesubmissions.*', 'programs.program as program', 'programs.acc as acc')
     ->get();
+
+
+    $settingss = Settings::first();
+    
+if (!$settingss || $settingss->grades == 0) {
+    abort(403, 'Access to grades is disabled.');
+}
+
         return view('addgradesubmission',['subjects'=>$subjects,'settings'=>$settings,'Gradesubmissions'=>$Gradesubmissions,'programs'=>$programs]);
     }public function getSubjectsByProgram($programId)
     { $settings = Settings::first(); // adjust if you have multiple settings
@@ -55,6 +63,43 @@ class GradeController extends Controller
         return view('viewgradesubmissionadmin',['settings'=>$settings,'gradesStudent'=>$gradesStudent,'gradessubmissions'=>$gradessubmissions]);
    
  }
+
+ public function editsettings(Request $request)
+    {
+
+        try{  
+            settings::where('id', 1)->update([
+                'academicyear' => $request->academicyear,
+                'year' => $request->year,
+                'semester' => $request->semester
+            ]);
+            $user = Auth::user();
+            $idsss = Auth::id();
+        Logs::create(['userid'=>$idsss,
+        'remarks'=> 'User ID '.$idsss.' update the settings in the system.'
+    ]);
+            return back()->with('success', 'Settings updated Successfully!');
+        } catch (Exception $e) {
+            return response()->json(['error' => 'Error updating status'], 500);
+      }
+        
+    }
+
+    public function editcor(Request $request)
+{
+    $settings = Settings::find(1); // Update first record in settings
+
+    $settings->cor = $request->has('cor') ? 1 : 0; // Set 1 if checked, 0 if not checked
+
+    $settings->enrollment = $request->has('enrollment') ? 1 : 0; // Set 1 if checked, 0 if not checked
+
+    $settings->grades = $request->has('grade') ? 1 : 0; // Set 1 if checked, 0 if not checked
+
+    $settings->save();
+
+    return back()->with('success', 'Settings updated successfully!');
+}
+
     public function addgradesubmit(Request $request)
     {
         try {
@@ -76,7 +121,7 @@ class GradeController extends Controller
             $newProduct = Gradesubmissions::create([
                 'gradeName' => $request->gName,
                 'section' => $request->section,
-                'subject' => $request->program,
+                'gsID' => $request->program,
                 'coursecode' => $request->coursecode,
                 'semester' => $request->semester,
                 'year' => $request->year,
@@ -86,6 +131,7 @@ class GradeController extends Controller
                 'timestart' => $request->timestart,
                 'timeend' => $request->timeend,
                 'day' => $request->day,
+                'program' =>''
             ]);
         
             Grades::where('year', $request->year)
@@ -145,7 +191,7 @@ class GradeController extends Controller
         ->where('grades.tID', $teacherID)
         ->where('grades.year', $gradesubmission->year)
         ->where('grades.subject', $gradesubmission->coursecode)
-        ->where('grades.gsID', $gradesubmission->subject)
+        ->where('grades.gsID', $gradesubmission->gsID)
         ->select('grades.*', 'students.fName', 'students.lName', 'students.mName')
         ->get();
     
@@ -153,7 +199,7 @@ class GradeController extends Controller
         $settings = settings::where('id', '=', 1)->get();
     
         // Get curriculum subjects linked to this program ID
-        $pid = $gradesubmission->subject;
+        $pid = $gradesubmission->gsID;
         $subjects = Curriculums::where('pID', $pid)
             ->whereNull('status')
             ->get();
@@ -163,6 +209,40 @@ class GradeController extends Controller
             'settings' => $settings,
             'gradesStudent' => $gradesStudent,
             'Gradesubmissions' => $Gradesubmissions
+        ]);
+    }
+
+    public function printggs($id)
+    { $gradesubmission = Gradesubmissions::findOrFail($id); // Get one row
+        $teacherID = Auth::user()->id;
+    
+        // Get all grade rows assigned to this teacher and section and year
+        $gradesStudent = Grades::join('students', 'grades.kldID', '=', 'students.kldID')
+        ->where('grades.section', $gradesubmission->section)
+        ->where('grades.tID', $teacherID)
+        ->where('grades.year', $gradesubmission->year)
+        ->where('grades.subject', $gradesubmission->coursecode)
+        ->where('grades.gsID', $gradesubmission->gsID)
+        ->select('grades.*', 'students.fName', 'students.lName', 'students.mName')
+        ->get();
+    
+        $Gradesubmissions = Gradesubmissions::where('id', '=', $id)->get();
+        $settings = settings::where('id', '=', 1)->first(); $pid = $gradesubmission->gsID;
+        $c=Programs::where('id',$pid)->first();
+        $cc=Curriculums::where('pID',$pid)->first();
+        // Get curriculum subjects linked to this program ID
+       
+        $subjects = Curriculums::where('pID', $pid)
+            ->whereNull('status')
+            ->get();
+    
+        return view('printggs', [
+            'subjects' => $subjects,
+            'settings' => $settings,
+            'gradesStudent' => $gradesStudent,
+            'Gradesubmissions' => $Gradesubmissions,
+            'programs'=>$c,
+            'curr'=>$cc
         ]);
     }
     public function updategrades(Gradesubmissions $Gradesubmissions, Request $request)

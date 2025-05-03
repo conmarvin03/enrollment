@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 
+use App\Models\settings;
 class CurriculumController extends Controller
 {
     public function index()
@@ -20,7 +21,8 @@ class CurriculumController extends Controller
             
             return view('dashboard'); 
         }else{
-
+            
+        
             return view('dashboard'); 
         }
     }

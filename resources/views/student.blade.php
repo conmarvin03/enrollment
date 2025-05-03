@@ -61,8 +61,8 @@
                     <form action="{{ route('import.excelStudent') }}" method="POST" enctype="multipart/form-data">
                         @csrf
                        <button type="submit" class="btn btn-dark" style="float: right;">Import Excel</button>  <h2 class="lead p-3">Import Excel</h2> <hr class=" w-100">
-                
-                    <input type="file"  class="p-3"  class="form-control" name="file" required><br>
+                       <br><input type="file" class="form-control" name="file" class="mt-4 form-control">
+                            <br>
                   
                                    </form> 
 
@@ -72,7 +72,8 @@
                         <p class="h5">Students Information</p>
                         <hr>
                         
-                        <form action="{{route('addstudents')}}" method="post">
+                        <form action="{{route('addstudents')}}" method="post" enctype="multipart/form-data">
+
                             @csrf
                                 @method('post')
                             <div class="card-body">
@@ -80,7 +81,7 @@
                                 
                             <div class="form-group">
                                 <label class="mt-2">Image:</label>
-                                <input type="file" class="form=control" name="img" class="mt-3 form-control">
+                                <input type="file" class="form-control" name="img" class="mt-3 form-control">
                                 <div class="row">
                                     <div class="col-4">
                                         <label>First Name:</label>
@@ -107,7 +108,7 @@
                         <div class="col-4">
                             
                             <label class="mt-1">Program:</label>
-                            <select class="form-control border-secondary" name="pID">
+                            <select class="form-control border-secondary" name="pID" required>
                                 <option value=""> Select Program </option>
                                 @foreach ($programs as $programs)
                                 <option value="{{$programs->id}}">{{$programs->program}} </option>
@@ -116,7 +117,12 @@
                             </select>
                         </div>
                     </div>
-                       
+                    <div class="row">
+                        <div class="col-4">
+                            <label class="mt-1">Section:</label>
+                            <input type="text" class="form-control w-100 border-secondary" name="section" required placeholder="Enter Section"> 
+                        </div>
+                    </div>
                             <div class="row">
                                 <div class="col-8">
                            

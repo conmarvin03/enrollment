@@ -65,7 +65,7 @@
                                     {
                                         ?>
                                         
-                                        <img class="profile-user-img" style=" display:inline; height:300px; width:250px; " src="/upload/profilepic/nodp.jpg"  alt="User profile picture">
+                                        <img class="profile-user-img" style=" display:inline; height:300px; width:250px; " src="/upload/nodp.jpg"  alt="User profile picture">
                                     
                                     <?php }else{?> 
                                         <img class="profile-user-img" style="display:inline; height:300px; width:250px;" src="/{{$students->img}}"  alt="User profile picture">

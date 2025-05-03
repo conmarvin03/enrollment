@@ -22,7 +22,9 @@ Route::middleware([
     
         Route::get('/get-subjects-by-program/{programId}', [GradeController::class, 'getSubjectsByProgram']);
         Route::get('/grades', [GradeController::class, 'index'])->name('addgradesubmission');
-       
+        
+        
+        route::get('/printgradesheet/{Gradesubmissions}/',[GradeController::class,'printggs'])->name('printggs');
         route::put('/submission/{id}/edit',[GradeController::class,'editgrades'])->name('editgrades'); 
         route::put('/grades/{Gradesubmissions}/update',[GradeController::class,'updategrades'])->name('updategrades');  
         route::post('/add-grades',[GradeController::class,'addgradesubmit'])->name('addgradesubmit');
@@ -43,7 +45,10 @@ Route::middleware([
     
         route::get('/show-grades',[StudentController::class,'showGrades'])->name('show.grades');
         
+        Route::get('/printcog',[ProgramController::class,'printcog'])->name('printcog');
        
+        route::post('/enrollnxtsem',[StudentController::class,'enrollnxtsem'])->name('enrollnxtsem');  
+        
     });
 
     Route::middleware([CheckRole::class . ':'])->group(function () {
@@ -59,10 +64,12 @@ Route::middleware([
         route::get('/course/{curriculum}/edit',[ProgramController::class,'editcourse'])->name('course.edit'); 
         route::put('/course/{curriculum}/update',[ProgramController::class,'updatecourse'])->name('updatecourse');    
     
-    
+        route::post('/editsettings',[GradeController::class,'editsettings'])->name('editsettings');  
+        route::post('/editcor',[GradeController::class,'editcor'])->name('editcor');  
        
         route::put('/curriculum/{curriculum}/update',[ProgramController::class,'updateStatus'])->name('updateStatus');
     
+        route::get('/settings',[ProgramController::class,'settings'])->name('settings');
     // add prereq
         route::post('/addprereq',[ProgramController::class,'addprereq'])->name('addprereq');
       
@@ -90,7 +97,10 @@ Route::middleware([
         Route::get('/teachers/create', [StudentController::class, 'teacherscreate'])->name('users.teacher');
         Route::post('/admin/teachers/store', [StudentController::class, 'teachersstore'])->name('teachers.store');
         
-    
+        Route::get('/get-curriculum/{pID}', [StudentController::class, 'getCurriculum'])->name('get.curriculum');
+        Route::get('/enroll/student', [StudentController::class, 'enrollStudent'])->name('enroll.student');
+        
+        Route::post('/grade/enroll', [StudentController::class, 'gradeEnroll'])->name('grade.enroll');
     });
    
   

@@ -116,7 +116,7 @@ class StudentImport implements ToCollection, WithHeadingRow
                     'gsID' => $row['pid'],
                     'remark' => '--',
                     'status' => '',
-                    'name' => ''
+                    'years' => 1
                 ]
             );
         }

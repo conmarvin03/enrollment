@@ -10,6 +10,6 @@ class Grades extends Model
     use HasFactory;
 
     protected $fillable = [
-       'gsID','grade','remark','kldID', 'semester','year','section','tID','name','status','subject'
+       'gsID','grade','remark','kldID', 'semester','year','section','tID','years','status','subject'
     ];
 }

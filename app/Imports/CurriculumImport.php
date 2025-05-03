@@ -24,11 +24,12 @@ class CurriculumImport implements ToModel, WithHeadingRow
            
             [
             'course' => $row['course'],
-            'type' => $row['type'],
+            'type' => $row['type'],  
+            'status'=>null,
             'semester' => $row['semester'],
             'years' => $row['years'],
             'unit' => $row['unit'],         
-            'leclab' => $row['leclab'],  
+            'leclab' => $row['leclab']
             ]
                      
         );

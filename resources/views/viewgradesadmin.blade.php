@@ -71,33 +71,27 @@
                   cursor: help;
                 }
               </style>
-        
-
-        @if($settings->enrollment)
-        <form action="{{ route('enrollnxtsem') }}" method="post" enctype="multipart/form-data">
+      
+        <a href="{{route('students')}}" style="float: right;" class="btn btn-outline-primary  ml-2">go back</a>
+  
+        {{-- <form action="{{ route('enrollnxtsem') }}" method="post" enctype="multipart/form-data">
             @csrf
             @method('post') 
-            <button type="submit" class="btn btn-primary" style="float: right;"><i class="fa-solid fa-door-open"></i>Enroll</button>
+            <input type="submit" class="btn btn-primary" style="float: right;" value="Enroll">
         </form>
-    @endif  
-   
+   --}}
+    
+        
 
                         </div>
-                        @foreach ($id as $id)
-                        {{ $id->kldID }}
-                        @endforeach   
-                          </div>
+                 
                           @php
                           $groupedGrades = $grades->groupBy(function ($item) {
                               return $item->year . '-' . $item->semester;
                           });
                           $accordionId = 'accordionExample';
                       @endphp
-                       @if($settings->cor)
-                                       
-                       <a href="{{route('printcog')}}"><button type="submit" style="float: right;" class="btn btn-secondary m-3"><i class="fa-solid fa-download"></i></button></a>
-                   @endif
-                           
+                      
                       <div class="accordion" id="{{ $accordionId }}">
                           @php $index = 0; @endphp
                           @foreach ($groupedGrades as $key => $group)
@@ -119,7 +113,12 @@
                                   </h2> 
                                   <div id="{{ $collapseId }}" class="accordion-collapse collapse {{ $index == 0 ? 'show' : '' }}" aria-labelledby="{{ $headingId }}" data-bs-parent="#{{ $accordionId }}">
                                       <div class="accordion-body">
-                                    
+                            
+                                        <form action="" method="post" enctype="multipart/form-data">
+                                            @csrf
+                                            <button type="submit" class="btn btn-secondary m-3">COR</button>
+                                        </form>
+                             
                                     
                                         <table class="table-responsive text-center display table table-bordered border-success">
                                               <thead class="text-center">

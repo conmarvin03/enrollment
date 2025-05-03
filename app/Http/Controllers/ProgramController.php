@@ -6,10 +6,13 @@ use App\Imports\CurriculumImport;
 use App\Models\Programs;
 use App\Models\Curriculums;
 use App\Models\Prereqs;
+use App\Models\Settings;
+use App\Models\Grades;
 use Illuminate\Http\Request;
 use Exception;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Logs;
+use App\Models\Students;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
 class ProgramController extends Controller
@@ -18,6 +21,11 @@ class ProgramController extends Controller
     {
         $program=Programs::all();
         return view('programs',['program'=>$program]);
+    }
+    public function settings()
+    {
+        $settings=Settings::where('id','=',1)->first();
+        return view('settings',['settings'=>$settings]);
     }
 
     public function updateStatus(Curriculums $curriculums ,Request $request)
@@ -37,6 +45,23 @@ class ProgramController extends Controller
         } catch (Exception $e) {
             return back()->with('error', 'Error!');
       }
+    }
+
+    public function printcog()
+    {
+        $user = Auth::user();
+        $idsss = Auth::id();
+        $settings=Settings::where('id','=',1)->first();
+        $user= Students::where('kldID',Auth::user()->kldID)->first();
+        $grades = Grades::where('grades.kldID', Auth::user()->kldID)
+    ->where('grades.semester', $settings->semester)
+    ->where('grades.year', $settings->year)
+    ->join('users', 'users.id', '=', 'grades.tID')
+    ->join('curriculums', 'curriculums.courseCode', '=', 'grades.subject')
+    ->select('grades.*', 'users.name as teacher_name', 'curriculums.course')
+    ->get();
+
+        return view('printcog',['grades'=>$grades,'user'=>$user,'settings'=>$settings]);
     }
     public function addprogram(Request $request)
     {

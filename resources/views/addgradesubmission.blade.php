@@ -168,7 +168,6 @@
                     <table  id="example"  class="table-responsive text-center display table table-striped table-hover table-bordered border-success" >
                         <thead class="text-center">
                          <tr>
-                            <th class="text-center">ID</th>
                             <th class="text-center" >Grade Name</th>
                             <th class="text-center">Course</th>
                             <th class="text-center">Program</th>
@@ -184,7 +183,6 @@
                         <tbody>
                         @foreach ($Gradesubmissions as $Gradesubmissions)
                         <tr>
-                        <td class="text-center" ><b>{{$Gradesubmissions->id}}</b></td>
                         <td class="text-center" ><b>{{$Gradesubmissions->gradeName}}</b></td>
                         <td class="text-center" ><b>{{$Gradesubmissions->coursecode}}</b></td>
                         <td class="text-center" ><b>{{ $Gradesubmissions->acc}}</b></td>
@@ -216,7 +214,7 @@
                                             <?php }else{ ?>
                                                 <h1 class="bg-success">Grades already published</h1>
                                             </b></td>
-                                            <td><a class="navbar-brand text-dark btn btn-outline-secondary disabled"   href="{{route('grades.edit',['Gradesubmissions'=> $Gradesubmissions])}}"><i class="fa-regular fa-pen-to-square"></i> Edit</a>
+                                            <td><a class="navbar-brand text-dark btn btn-outline-secondary"   href="{{route('printggs',['Gradesubmissions'=> $Gradesubmissions])}}"><i class="fa-regular fa-pen-to-square"></i> Print Grade Sheet</a>
                                             </td>
                                               
                                                 <?php }?>

@@ -13,17 +13,21 @@
                 <!-- Navigation Links -->
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
                    <?php 
-use Illuminate\Support\Facades\Auth; ?>
+use Illuminate\Support\Facades\Auth; 
+use App\Models\Settings; 
+$settings = Settings::first(); // Or find(1) if you're strict
+?>
                     <x-nav-link href="{{ route('dashboard') }}" :active="request()->routeIs('dashboard')">
                         {{ __('Dashboard') }}
                     </x-nav-link>
-                </div> <?php if(Auth::user()->role=="teacher"){?>
-
+                </div> <?php if(Auth::user()->role=="teacher" ){?>
+<?php if($settings->grades==1){?>
                     <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
                             <x-nav-link href="{{ route('addgradesubmission') }}" :active="request()->routeIs('addgradesubmission')">
                                 {{ __('Grades') }}
                             </x-nav-link>
                         </div>
+                        <?php } ?>
                 <?php }else if(Auth::user()->role=="Student"){?> 
                     <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
                         <x-nav-link href="{{ route('show.grades') }}" :active="request()->routeIs('show.grades')">
@@ -60,15 +64,22 @@ use Illuminate\Support\Facades\Auth; ?>
                         {{ __('Grades') }}
                     </x-nav-link>
                     </div>
+                    <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
+                  
+                        <x-nav-link href="{{ route('enroll.student') }}" :active="request()->routeIs('enroll.student')">
+                            {{ __('Enroll') }}
+                        </x-nav-link>
+                        </div>
                 <?php }?>
                 </div>      
                  <div class="hidden sm:flex sm:items-center sm:ms-6">
-                
+                    <?php if(Auth::user()->role==""){?>
                     <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                        <x-nav-link href="{{ route('students') }}" >
+                        <x-nav-link href="{{ route('settings') }}" >
                         <i class="fa-solid fa-gear"></i>
                     </x-nav-link>
                 </div>
+                <?php }?>
                 <!-- Teams Dropdown -->
                 @if (Laravel\Jetstream\Jetstream::hasTeamFeatures())
                     <div class="ms-3 relative">

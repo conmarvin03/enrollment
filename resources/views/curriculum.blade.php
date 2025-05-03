@@ -184,7 +184,7 @@
             color: 'gray',
             path: 'straight',
             startSocket: 'right',
-            endSocket: 'bottom',
+            endSocket: 'left',
             startPlug: 'disc',
             endPlug: 'arrow1',
             size: 2,

@@ -11,6 +11,6 @@ class settings extends Model
     use HasFactory;
 
     protected $fillable = [
-       'academicyear','semester','year'
+       'academicyear','semester','year','cor','grades','enrollment'
      ];
 }
