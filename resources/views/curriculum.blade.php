@@ -169,8 +169,8 @@
     });
 
     prerequisites.forEach(pr => {
-      const from = document.getElementById(`subject-${pr.course}`);
-      const to = document.getElementById(`subject-${pr.prerequisite}`);
+      const from = document.getElementById(`subject-${pr.prerequisite}`);
+      const to = document.getElementById(`subject-${pr.course}`);
 
       if (from && to) {
         const type = to.getAttribute("title-type") || '';

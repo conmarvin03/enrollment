@@ -34,6 +34,14 @@ $settings = Settings::first(); // Or find(1) if you're strict
                             {{ __('Grades') }}
                         </x-nav-link>
                     </div>
+
+                    <?php }else if(Auth::user()->role=="capi"){?> 
+                        <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
+                            <x-nav-link href="{{ route('schedule') }}" :active="request()->routeIs('schedule')">
+                                {{ __('Schedule') }}
+                            </x-nav-link>
+                        </div>
+
                     <?php }else{?>
                         <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
                             <x-nav-link href="{{ route('users.create') }}" :active="request()->routeIs('Admins')">
@@ -70,6 +78,13 @@ $settings = Settings::first(); // Or find(1) if you're strict
                             {{ __('Enroll') }}
                         </x-nav-link>
                         </div>
+                        <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
+                  
+                            <x-nav-link href="{{ route('changesection') }}" :active="request()->routeIs('enroll.student')">
+                                {{ __('Sectioning') }}
+                            </x-nav-link>
+                            </div>
+                        
                 <?php }?>
                 </div>      
                  <div class="hidden sm:flex sm:items-center sm:ms-6">

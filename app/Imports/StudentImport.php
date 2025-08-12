@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Models\Students;
 use App\Models\Curriculums;
 use App\Models\Grades;
+use App\Models\Settings;
 use Maatwebsite\Excel\Concerns\ToCollection;
 use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
@@ -51,7 +52,7 @@ class StudentImport implements ToCollection, WithHeadingRow
         foreach ($importData as $row) {
             $email = strtolower(trim($row['email']));
             $kldnum = trim($row['kldnum']);
-
+            $settings=Settings::where('id',1)->first();
             // Update or create in User table
             User::updateOrCreate(
                 ['kldID' => $kldnum, 'email' => $email],
@@ -69,7 +70,7 @@ class StudentImport implements ToCollection, WithHeadingRow
                     'gender' => trim($row['gender']),
                     'bday' => trim($row['bday']),
                     'address' => trim($row['address']),
-                    'ay' => trim($row['ay']),
+                    'ay' => trim($settings->year),
                     'section' => trim($row['section'])
                 ]
             );
@@ -89,7 +90,7 @@ class StudentImport implements ToCollection, WithHeadingRow
                     'gender' => trim($row['gender']),
                     'bday' => trim($row['bday']),
                     'address' => trim($row['address']),
-                    'ay' => trim($row['ay']),
+                    'ay' => trim($settings->year),
                     'section' => trim($row['section'])
                 ]
             );
@@ -106,7 +107,7 @@ class StudentImport implements ToCollection, WithHeadingRow
                     'kldID' => $kldnum,
                     'subject' => $subject->courseCode,
                     'semester' => 1,
-                    'year' => $row['ay'], // include year to avoid duplicates per year
+                    'year' =>$settings->year, // include year to avoid duplicates per year
                     'section' => trim($row['section']),
                 ],
                 [

@@ -179,20 +179,20 @@
             window.print();
         }
 
-      
-function downloadPDF() {
+        function downloadPDF() {
     const element = document.getElementById('bond-paper');
 
     const opt = {
-        margin:       0,
+        margin:       [10, 10, 10, 10], // top, left, bottom, right
         filename:     'grade-sheet.pdf',
         image:        { type: 'jpeg', quality: 1 },
         html2canvas:  { scale: 2, useCORS: true },
-        jsPDF:        { unit: 'px', format: [816, 1248], orientation: 'portrait' } // match your div size
+        jsPDF:        { unit: 'pt', format: 'legal', orientation: 'portrait' } // use 'legal' to match 8.5x13 inches
     };
 
     html2pdf().set(opt).from(element).save();
 }
+
 
 
     </script>

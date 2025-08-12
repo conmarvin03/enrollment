@@ -25,7 +25,7 @@
             });
         </script>
     @endif
-    <div class="py-12">
+    {{-- <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
        
         <div class="card card-success">
@@ -62,16 +62,19 @@
                                     <div class="col-4">
                                         <div class="row">
                                             <div class="col">
-                                        <label>Section</label>
-                                        <input type="text" class="form-control w-100 border-secondary" name="section" required placeholder="Enter Last Name">
-                                            </div>
-                                            <div class="col">
                                                 <label>Program</label>
                                                 <select name="program" id="programDropdown" required class="form-control border-secondary">
                                                     <option value="">Select Program</option>
                                                     @foreach ($programs as $program)
                                                         <option value="{{ $program->id }}">{{ $program->acc . '-' . $program->program }}</option>
                                                     @endforeach
+                                                </select>
+                                    </div>
+                                            <div class="col">
+                                              
+                                                <label>Section</label>
+                                                <select name="section" id="sectionDropdown" required class="form-control border-secondary">
+                                                    <option value="">Select Section</option>
                                                 </select>
                                             </div>
                                         </div>
@@ -112,8 +115,8 @@
                                 <option>Friday</option>
                                 <option>Saturday</option>
                                 <option>Sunday</option>
-                            </select>
-                        </div>    <div class="col-4">  @foreach ($settings as $settings)
+                            </select> --}}
+                        {{-- </div>    <div class="col-4">  @foreach ($settings as $settings)
                             <label class="mt-1">Academic year:</label> <h1>{{ $settings->year }}</h1>
                             <input type="text" class="form-control w-100 border-secondary" name="year" style="display:none;" value="{{$settings->year}}" required placeholder="Enter KLD ID No.">  
                         </div>
@@ -142,8 +145,8 @@
                             <div class="row">
                                 <div class="col-8">
                            
-                                </div>  @endforeach   
-                                <div class="col-4">
+                                </div>  @endforeach    --}}
+                                {{-- <div class="col-4">
                            <button type="submit" class="btn btn-outline-success mt-2" style="float: right;"><i class="fa-solid fa-plus"></i> Add Schedule</button>
                                 </div></div>
                                 
@@ -155,7 +158,10 @@
            
                     </div>
                  
-                  </div>   </form>
+                  </div>   </form> --}}
+                  <div class="py-12">
+        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+       
             <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg pt-2">
                 <div class="row">
                     <div class="col">
@@ -257,8 +263,21 @@
                     });
                 }
             });
+            $.ajax({
+    url: '{{ url("/get-sections-by-program") }}/' + programId,
+    type: 'GET',
+    success: function (data) {
+        $('#sectionDropdown').empty().append('<option value="">Select Section</option>');
+        $.each(data, function (index, section) {
+            $('#sectionDropdown').append(
+                '<option value="' + section + '">' + section + '</option>'
+            );
+        });
+    }
+});
+
         } else {
-            $('#courseDropdown').html('<option value="">Select Course</option>');
+            $('#sectionDropdown').html('<option value="">Select Section</option>');
         }
     });
 </script>

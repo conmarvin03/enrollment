@@ -21,6 +21,7 @@ Route::middleware([
     Route::middleware([CheckRole::class . ':teacher'])->group(function () {
     
         Route::get('/get-subjects-by-program/{programId}', [GradeController::class, 'getSubjectsByProgram']);
+        Route::get('/get-sections-by-program/{programId}', [GradeController::class, 'getSectionsByProgram']);
         Route::get('/grades', [GradeController::class, 'index'])->name('addgradesubmission');
         
         
@@ -40,6 +41,15 @@ Route::middleware([
         
     });
     
+    Route::middleware([CheckRole::class . ':capi'])->group(function () {
+        // Route::get('/asd', [GradeController::class, 'index'])->name('addgradesubmission');
+    
+        route::get('/schedule',[StudentController::class,'viewSchedule'])->name('schedule'); 
+        Route::post('/import-schedule', [StudentController::class, 'importschedule'])->name('import.schedule');
+    });
+
+
+
     Route::middleware([CheckRole::class . ':Student'])->group(function () {
         // Route::get('/asd', [GradeController::class, 'index'])->name('addgradesubmission');
     
@@ -52,9 +62,14 @@ Route::middleware([
     });
 
     Route::middleware([CheckRole::class . ':'])->group(function () {
+
+        
+        
         Route::put('/admingrades/edit-all', [GradeController::class, 'adminbulkEdit'])->name('admingrades.bulk');
+        Route::put('/adminsection/edit-all', [GradeController::class, 'adminbulkEditSection'])->name('adminseciton.bulk');
         Route::get('/grade/admin', [GradeController::class, 'geditadmin'])->name('admingrade');
     
+        Route::get('/sectioning', [ProgramController::class, 'sectioning'])->name('changesection');
         Route::get('/programs',[ProgramController::class,'index'])->name('programs');
         route::post('/addprograms',[ProgramController::class,'addprogram'])->name('addprograms');
     
@@ -103,7 +118,7 @@ Route::middleware([
         Route::post('/grade/enroll', [StudentController::class, 'gradeEnroll'])->name('grade.enroll');
     });
    
-  
+    
 
     route::get('/dashboard',[CurriculumController::class,'index'])->name('dashboard');
 });

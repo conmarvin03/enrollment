@@ -61,91 +61,7 @@
                                     <div class="col-4">
                                    
                                     @foreach ($Gradesubmissions as $Gradesubmissions)
-                                    <form action="{{route('updategrades',['Gradesubmissions'=> $Gradesubmissions])}}" method="post" enctype="multipart/form-data">
-                                    @csrf
-                                    @method('put') 
-                                    <label>Grade Name:</label>
-                                    <input type="text" class="form-control w-100 border-secondary" name="gName"  value=" {{ $Gradesubmissions->gradeName }}" placeholder="Enter Grade Name">
-                                    <input type="text" class="form-control w-100 border-secondary" name="id" readonly  value=" {{ $Gradesubmissions->id }}" style="display: none;" placeholder="Enter Grade Name">
-                                 
-                                     
-                                     
-                                    </div>
-                                    <div class="col-4">
-                                        <label>Section Format Eg. (BSIS101)</label>
-                                        <input type="text" class="form-control w-100 border-secondary" readonly value=" {{ $Gradesubmissions->section }}" name="section" required placeholder="Enter Last Name">
-                                    </div>
-                                    <div class="col-4">
-                                        <label style="">Subject</label>
-                                        <input type="text" class="form-control w-100 border-secondary" readonly value=" {{ $Gradesubmissions->coursecode}}" name="coursecode"  required placeholder="Enter Last Name">
-                                  
-                                        <select name="coursecode" style="display:none;" class="form-control w-100 form-control-broder border-secondary">
-                                        <option value="">Select Course Code</option>
-                                        @foreach ($subjects as $subjects)
-                                       
-                                            <option <?php if($subjects->courseCode==$Gradesubmissions->coursecode){?> selected <?php }?> value="{{$subjects->courseCode}}">{{$subjects->courseCode.'-'.$subjects->course}}</option>
-                                                @endforeach   
-                                    </select>
-
-                                    @endforeach
-                                </div>
-                                <div class="col-4 mt-2">
-                                    <label>Room</label>
-                                    <input type="text" class="form-control w-100 border-secondary" name="room" value="{{$Gradesubmissions->room}}" required placeholder="Enter room">
-                                </div>
-                                
-                                <div class="col-4 mt-2">
-                                    <label>Time Start</label>
-                                    <input type="text" class="form-control w-100 border-secondary" name="timestart" value="{{$Gradesubmissions->timestart}}" required placeholder="Time Start">
-                                </div>
-                                
-                                <div class="col-4 mt-2">
-                                    <label>Time End</label>
-                                    <input type="text" class="form-control w-100 border-secondary" name="timeend"  value="{{$Gradesubmissions->timeend}}" required placeholder="Time End">
-                                </div>
-                                </div>
-                                <div class="row">
-                                
-                        <div class="col-4">
-                            <label>Day</label>
-                            <select class="form-control w-100 border-secondary"  required name="day">
-                                <option value="">Select Day</option>
-                                <option <?php if($Gradesubmissions->day=="Monday"){?> selected<?php }?>>Monday</option>
-                                <option <?php if($Gradesubmissions->day=="Tuesday"){?> selected<?php }?>>Tuesday</option>
-                                <option <?php if($Gradesubmissions->day=="Wednesday"){?> selected<?php }?>>Wednesday</option>
-                                <option <?php if($Gradesubmissions->day=="Thursday"){?> selected<?php }?>>Thursday</option>
-                                <option <?php if($Gradesubmissions->day=="Friday"){?> selected<?php }?>>Friday</option>
-                                <option <?php if($Gradesubmissions->day=="Saturday"){?> selected<?php }?>>Saturday</option>
-                                <option <?php if($Gradesubmissions->day=="Sunday"){?> selected<?php }?>>Sunday</option>
-                            </select>
-                        </div>  
-                                </div>
-                                <div class="row">
-                             
-                                <div class="col-4"> @foreach ($settings as $settings)
-                            <label class="mt-1">Academic year:</label> <h1>{{ $settings->academicyear }} - {{ $settings->year }}</h1>
-                            <input type="text" class="form-control w-100 border-secondary" name="year" style="display:none;" value="{{$settings->academicyear.'-'.$settings->year}}" required placeholder="Enter KLD ID No.">  
-                        </div>
-                        <div class="col-4">
-                            <label class="mt-1">Semester:</label>
-                            <h1>
-
-                            <?php if($settings->semester==1){ ?>
-                                <h1>First Semester</h1>
-                                <?php }else if($settings->semester==2){ ?> 
-                                    <h1>Second Semester</h1>
-                               
-                                <?php }else if($settings->semester==3) {  ?>
-                                    <h1>Summer</h1>
-                               
-                                    <?php }?> </div>
-@endforeach
-                            </h1><input type="text" class="form-control w-100 border-secondary" name="semester" style="display:none;" value="{{$settings->semester}}" required placeholder="Enter KLD ID No.">  
-                 
-                        <input type="text" value="{{ auth()->user()->id }}" style="display:none;" name="tID" >
-                        <div class="col-4">
-                        <button type="submit" class="btn btn-outline-success mt-2" style="float: right;"><i class="fa-solid fa-pen"></i> Edit Student</button>
-                        </form>
+                           
                     </div>  
                     
                             <div class="row">
@@ -154,7 +70,6 @@
                                 </div>
                                 <div class="col-4">
                                  </div></div>
-                                 <hr class=" w-100 mt-5">
                                  <div class="row">
                                
                         <h2 class="lead p-3">Import Grades</h2>
@@ -169,7 +84,7 @@
                   <input type="text" value="{{$Gradesubmissions->coursecode}}" name="subject" style="display: none;">
                        
                   <input type="text" value="{{$Gradesubmissions->tID}}"  name="tID" style="display: none;" >
-                       
+                       @endforeach 
                     <button type="submit" class="btn btn-dark" style="float: right;">Import Excel</button> 
                     </form> 
                          

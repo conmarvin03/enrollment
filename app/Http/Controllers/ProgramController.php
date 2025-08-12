@@ -46,6 +46,18 @@ class ProgramController extends Controller
             return back()->with('error', 'Error!');
       }
     }
+    public function sectioning()
+    {
+        
+        $gradesStudent= Grades::join('students', 'grades.kldID', '=', 'students.kldID')
+        ->where('grades.grade', 0)
+        ->select('grades.*', 'students.fName', 'students.lName', 'students.mName')  ->orderBy('grades.created_at', 'desc')->get();
+ 
+        $settings = settings::where('id','=',1)->get();
+
+     // Result: $allSections[gsID] => list of sections
+        return view('sectioning',['settings'=>$settings,'gradesStudent'=>$gradesStudent]);
+    }
 
     public function printcog()
     {
@@ -121,8 +133,8 @@ class ProgramController extends Controller
 
 
             $newProduct=Prereqs::create([
-            'courseCode'=>$request->coursecode,
-            'preReq'=>$request->prereq,
+            'courseCode'=>$request->prereq,
+            'preReq'=>$request->coursecode,
         'pID'=>$request->zxc,
             'status'=>''
             ]);

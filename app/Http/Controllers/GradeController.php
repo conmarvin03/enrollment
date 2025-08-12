@@ -5,8 +5,9 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 
 use App\Imports\GradeImport;
+use App\Models\Students;
 use App\Models\Curriculums;
-use App\Models\settings;
+use App\Models\Settings;
 use App\Models\Gradesubmissions;
 use App\Models\Grades;
 use Maatwebsite\Excel\Concerns\ToCollection;
@@ -26,14 +27,16 @@ class GradeController extends Controller
     {
         $subjects = Curriculums::where('status','=',NULL)->get();
         $programs = Programs::get();
-        $settings = settings::where('id','=',1)->get();
+        $settings = Settings::where('id','=',1)->first();
         $user = Auth::user();
         $idsss = Auth::id();
         
         $Gradesubmissions = Gradesubmissions::join('programs', 'gradesubmissions.gsID', '=', 'programs.id')
+      
     ->where('gradesubmissions.tID', $idsss)
     ->orderBy('gradesubmissions.id', 'DESC')
-    ->select('gradesubmissions.*', 'programs.program as program', 'programs.acc as acc')
+    ->select('gradesubmissions.*', 'programs.program as program', 'programs.acc as acc') ->where('gradesubmissions.year','=', $settings->year)
+        ->where('gradesubmissions.semester','=', $settings->semester)
     ->get();
 
 
@@ -44,7 +47,8 @@ if (!$settingss || $settingss->grades == 0) {
 }
 
         return view('addgradesubmission',['subjects'=>$subjects,'settings'=>$settings,'Gradesubmissions'=>$Gradesubmissions,'programs'=>$programs]);
-    }public function getSubjectsByProgram($programId)
+    }
+    public function getSubjectsByProgram($programId)
     { $settings = Settings::first(); // adjust if you have multiple settings
         $semester = $settings->semester;
         $subjects = Curriculums::where('pID', $programId)
@@ -52,6 +56,17 @@ if (!$settingss || $settingss->grades == 0) {
             ->get(['courseCode', 'course']);
     
         return response()->json($subjects);
+    }
+    public function getSectionsByProgram($programId)
+    { 
+        $settings = Settings::first(); // adjust if you have multiple settings
+        $semester = $settings->semester;
+      $sections = Grades::where('gsID', $programId)
+    ->distinct()
+    ->pluck('section');
+   
+    
+        return response()->json($sections);
     }
     public function geditadmin()
     {
@@ -68,19 +83,15 @@ if (!$settingss || $settingss->grades == 0) {
     {
 
         try{  
-            settings::where('id', 1)->update([
+            Settings::where('id', 1)->update([
                 'academicyear' => $request->academicyear,
                 'year' => $request->year,
                 'semester' => $request->semester
             ]);
-            $user = Auth::user();
-            $idsss = Auth::id();
-        Logs::create(['userid'=>$idsss,
-        'remarks'=> 'User ID '.$idsss.' update the settings in the system.'
-    ]);
+
             return back()->with('success', 'Settings updated Successfully!');
         } catch (Exception $e) {
-            return response()->json(['error' => 'Error updating status'], 500);
+          
       }
         
     }
@@ -242,7 +253,7 @@ if (!$settingss || $settingss->grades == 0) {
             'gradesStudent' => $gradesStudent,
             'Gradesubmissions' => $Gradesubmissions,
             'programs'=>$c,
-            'curr'=>$cc
+            'curr'=>$cc 
         ]);
     }
     public function updategrades(Gradesubmissions $Gradesubmissions, Request $request)
@@ -321,7 +332,29 @@ if (!$settingss || $settingss->grades == 0) {
 
     return back()->with('success', 'All grades updated successfully!');
 }
+
+public function adminbulkEditSection(Request $request)
+{
+    $ids = $request->input('ids', []);
+    $sections = $request->input('sections', []);
     
+    foreach ($ids as $index => $id) {
+        $section = $sections[$index] ?? null;
+        
+        if ($section !== null) {
+            Grades::where('id', $id)->update([
+                'section' => $section,'tID'=>0
+            ]);
+
+
+        }
+    }
+
+    return back()->with('success', 'All sections updated successfully!');
+}
+
+    
+
 public function bulkEdit(Request $request, $id)
 {
     try {

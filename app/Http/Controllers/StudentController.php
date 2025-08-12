@@ -13,6 +13,7 @@ use Exception;
 use App\Models\Students;
 
 use App\Actions\Fortify\CreateNewUser;
+use App\Imports\ScheduleImport;
 use App\Imports\StudentImport;
 use App\Models\Grades;
 use App\Models\Gradesubmissions;
@@ -28,6 +29,31 @@ class StudentController extends Controller
 
         $programs=Programs::all();
         return view('student',['students'=>$students,'programs'=>$programs]);
+    }
+
+    public function viewSchedule()
+    {   
+        $settings=Settings::where('id',1)->first();
+        $gradesubmission = Gradesubmissions::where('gradesubmissions.year', $settings->year)
+        ->where('gradesubmissions.semester', $settings->semester)
+        ->join('programs', 'gradesubmissions.gsID', '=', 'programs.id')
+        ->join('users', 'gradesubmissions.tID', '=', 'users.id')
+        ->select('gradesubmissions.*', 'programs.acc', 'programs.program', 'users.name as teacher_name') // select fields as needed
+        ->get();
+    
+        return view('schedule',compact('gradesubmission'));
+    }
+    public function importschedule(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|mimes:xlsx,csv'
+        ]);
+
+        Excel::import(new ScheduleImport, $request->file('file'));
+
+        
+
+        return back()->with('success', 'Schedule imported successfully!');
     }
     public function showGrades()
 {         $user = Auth::user();
@@ -74,96 +100,103 @@ class StudentController extends Controller
     
         return null; // No more semesters
     }
-public function enrollnxtsem()
-{  
-    $studentId = Auth::id();
-    $p = Auth::user();
-    $programId = $p->pID;
+
+
+
+    public function enrollnxtsem(Request $request)
+    {
+        // Retrieve the authenticated student's ID and program
+        $studentId = Auth::id();
+        $p = Auth::user();
+        $programId = $p->pID;
     
-    // Get latest enrolled subject to determine current year/semester
-    $currentGrade = Grades::where('kldID', $p->kldID)
-        ->orderBy('years', 'desc')
-        ->orderBy('semester', 'desc')
-        ->first();
+        // STEP 1: Get the latest enrolled subject to determine current year/semester
+        $currentGrade = Grades::where('kldID', $p->kldID)
+            ->orderBy('years', 'desc')
+            ->orderBy('semester', 'desc')
+            ->first();
     
-    if (!$currentGrade) {
-        return back()->with('error', 'No current enrollment found.');
-    }
-    
-    // Check if all grades are complete and published
-    $gradesWithIssues = Grades::leftJoin('users', 'grades.tID', '=', 'users.id')
-        ->join('curriculums', 'grades.subject', '=', 'curriculums.courseCode')
-        ->where('grades.gsID', $programId)
-        ->where('grades.kldID', $p->kldID)
-        ->where(function ($query) {
-            $query->where('grades.tID', '=', 0)
-                  ->orWhere('grades.grade', '=', 0)
-                  ->orWhere('grades.status', '!=', 'Published');
-        })
-        ->select('grades.*')
-        ->distinct()
-        ->get();
-    
-    if ($gradesWithIssues->isNotEmpty()) {
-        return back()->with('error', 'Must have grades in all subjects and all grades must be published!');
-    }
-    
-    // Get next year/semester
-    $nextSem = $this->getNextYearSemester($currentGrade->years, $currentGrade->semester, $programId);
-    
-    if (!$nextSem) {
-        return back()->with('error', 'No more semesters to enroll.');
-    }
-    
-    // Get next semester's subjects
-    $nextSubjects = Curriculums::where('years', $nextSem['year'])
-        ->where('semester', $nextSem['semester'])
-        ->where('pID', $programId)
-        ->get();
-    
-    $settings = Settings::first();
-    
-    foreach ($nextSubjects as $subject) {
-        // Check if the subject has a prerequisite
-        $prereq = Prereqs::where('preReq', $subject->id)->first();
-    
-        if ($prereq) {
-            // Get the prerequisite courseCode
-            $preReqCourseCode = Curriculums::where('id', $prereq->preReq)->value('courseCode');
-    
-            // Check if student passed the prerequisite (grade must be 1, 2, or 3)
-            $passedPrereq = Grades::where('kldID', $p->kldID)
-                ->where('subject', $preReqCourseCode)
-                ->where('grade', '>', 0)
-                ->where('grade', '<=', 3)
-                ->where('status', 'Published')
-                ->exists();
-    
-            if (!$passedPrereq) {
-                // Student failed the prerequisite, skip enrolling in this subject
-                continue;
-            }
+        if (!$currentGrade) {
+            return back()->with('error', 'No current enrollment found.');
         }
     
-        // Enroll the student in the subject
-        Grades::create([
-            'section'   => $p->section,
-            'subject'   => $subject->courseCode,
-            'years'     => $subject->years,
-            'semester'  => $subject->semester,
-            'grade'     => 0,
-            'remark'    => '--',
-            'status'    => '',
-            'kldID'     => $p->kldID,
-            'year'      => $settings->year,
-            'gsID'      => $p->pID,
-            'tID'       => 0
-        ]);
+        // STEP 2: Check if all grades are complete and published
+        $gradesWithIssues = Grades::leftJoin('users', 'grades.tID', '=', 'users.id')
+            ->join('curriculums', 'grades.subject', '=', 'curriculums.courseCode')
+            ->where('grades.gsID', $programId)
+            ->where('grades.kldID', $p->kldID)
+            ->where(function ($query) {
+                $query->where('grades.tID', '=', 0)
+                      ->orWhere('grades.grade', '=', 0)
+                      ->orWhere('grades.status', '!=', 'Published');
+            })
+            ->select('grades.*')
+            ->distinct()
+            ->get();
+    
+        if ($gradesWithIssues->isNotEmpty()) {
+            return back()->with('error', 'Must have grades in all subjects and all grades must be published!');
+        }
+    
+        // STEP 3: Get next year/semester (next academic year/semester)
+        $nextSem = $this->getNextYearSemester($currentGrade->years, $currentGrade->semester, $programId);
+    
+        if (!$nextSem) {
+            return back()->with('error', 'No more semesters to enroll.');
+        }
+    
+        // STEP 4: Get all subjects for the next semester
+        $nextSubjects = Curriculums::where('years', $nextSem['year'])
+            ->where('semester', $nextSem['semester'])
+            ->where('pID', $programId)
+            ->get();
+    
+        $settings = Settings::first();
+    
+        foreach ($nextSubjects as $subject) {
+            // STEP 5: Check if the subject has prerequisites in the prereqs table
+            $prereqs = Prereqs::where('courseCode', $subject->id)->get();
+    
+            foreach ($prereqs as $prereq) {
+                // Get the prerequisite course code (from the curriculums table)
+                $preReqCourseCode = Curriculums::where('id', $prereq->preReq)->value('courseCode');
+    
+                // STEP 6: Check if the student has passed the prerequisite subject (grade should be 1, 2, or 3)
+                $failedPrereqs = Grades::where('kldID', $p->kldID)
+                    ->where('subject', $preReqCourseCode)
+                    ->whereIn('grade', [5, 6])  // Grades 5 or 6 mean failure
+                    ->where('status', 'Published')
+                    ->exists();
+    
+                if ($failedPrereqs) {
+                    // If student failed the prerequisite, skip enrolling in this subject
+                    continue 2; // Skip this subject and go to the next one
+                }
+            }
+    
+            // STEP 7: If no prerequisites failed, enroll the student in this subject
+            Grades::create([
+                'section'   => $p->section,
+                'subject'   => $subject->courseCode,
+                'years'     => $subject->years,
+                'semester'  => $subject->semester,
+                'grade'     => 0,  // Initial grade is 0 (in-progress)
+                'remark'    => '--',  // Placeholder remark
+                'status'    => '',  // No status yet
+                'kldID'     => $p->kldID,
+                'year'      => $settings->year,
+                'gsID'      => $p->pID,
+                'tID'       => 0  // No teacher assigned yet
+            ]);
+        }
+    
+        // STEP 8: Success message
+        return back()->with('success', 'Next semester subjects enrolled successfully.');
     }
     
 
-    return back()->with('success', 'Next semester subjects enrolled successfully.');
-}
+
+
 public function gradeEnroll(Request $request)
 {  $settings = Settings::where('id', '=', 1)->first();
     // Check if a record exists with the same kldID, subject, and a grade less than 3
@@ -198,14 +231,14 @@ public function gradeEnroll(Request $request)
     ->where('year','=',$settings->year)
     ->where('gsID','=',$student->pID)
     ->where('semester','=',$settings->semester)->first();
-
+$settings=Settings::where('id',1)->first();
     if($gradesubmissions)
     {
         Grades::create([
             'section'   => $request->section,
             'subject'   => $subject->courseCode,
-            'years'     => $subject->years,
-            'semester'  => $subject->semester,
+            'years'     => $settings->year,
+            'semester'  => $settings->semester,
             'grade'     => 0,
             'remark'    => '--',
             'status'    => '',
@@ -219,8 +252,8 @@ public function gradeEnroll(Request $request)
         Grades::create([
             'section'   => $request->section,
             'subject'   => $subject->courseCode,
-            'years'     => $subject->years,
-            'semester'  => $subject->semester,
+            'years'     => $settings->year,
+            'semester'  => $settings->semester,
             'grade'     => 0,
             'remark'    => '--',
             'status'    => '',
@@ -363,7 +396,7 @@ $settings = Settings::first();
         // Validate and create user
         $user = $userCreator->create($request->all());
 
-        return redirect()->route('addadmin')->with('success', 'User added successfully!');
+        return redirect()->route('users.create')->with('success', 'User added successfully!');
     }
     public function teacherscreate()
     {
