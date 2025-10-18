@@ -11,13 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('students', function (Blueprint $table) {
-            $table->string('ay');
+     
+      Schema::table('users', function (Blueprint $table) {
             $table->string('section');
-        });
-        Schema::table('users', function (Blueprint $table) {
-            $table->string('ay');
-            $table->string('section');
+    
         });
     }
 

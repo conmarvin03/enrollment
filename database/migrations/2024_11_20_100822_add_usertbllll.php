@@ -12,15 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->integer('pID');
-            $table->string('kldID');
-            $table->string('fName');
-            $table->string('lName');
-            $table->string('mName');
-            $table->string('gender')->nullable();
-            $table->string('bday')->nullable();
-            $table->string('address')->nullable();
-            $table->string('img');
+            $table->string('ay');
+    
         });
     }
 
