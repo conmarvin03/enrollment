@@ -30,11 +30,11 @@
             <div class="accordion pt-4" id="accordionExample">
                 <div class="accordion-item">
                   <h2 class="accordion-header" id="headingOne ">
-                    <button class="accordion-button bg-success accordion-collapse" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
+                    <button class="accordion-button bg-success " type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
                         <i class="fa-solid fa-plus"></i>  &nbsp;&nbsp;Add Program
                     </button>
                   </h2>
-                  <div id="collapseOne" class="accordion-collapse collapse" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
+                  <div id="collapseOne" class="accordion-collapse" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
                     <div class="accordion-body">
                         <form action="{{route('addprograms')}}" method="post" enctype="multipart/form-data">
                             @csrf

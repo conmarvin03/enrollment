@@ -54,13 +54,13 @@
                                         </a>
                                     @endif --}}
                                 @endauth
-                                @if (Route::has('register'))
+                                <!-- @if (Route::has('register'))
                                 <a
                                     href="{{ route('register') }}"
                                     class="rounded-md px-3 py-2 text-black ring-1 ring-transparent transition hover:text-black/70 focus:outline-none focus-visible:ring-[#FF2D20]"
                                 >
                                     Register
-                                </a>
+                                </a> -->
                             @endif
                             </nav>
                         @endif
@@ -68,7 +68,7 @@
                     </header>
 
                     <p class="lead text-center">KOLEHIYO NG LUNGSOD NG DASMARINAS</p>
-                    {{-- <p class="lead text-secondary text-center"><i>Employee 201 File</i></p> --}}
+                   <p class="lead text-secondary text-center"><i>Student Information and Enrollment System (SIES)</i></p> 
                     <main class="mt-6">
                         <div class="grid gap-6 lg:grid-cols-2 lg:gap-8">
                             <a
@@ -153,9 +153,9 @@
                         </div>
                     </main>
 
-                    <footer class="py-16 text-center text-sm text-black">
+                    <!-- <footer class="py-16 text-center text-sm text-black">
                     CREATED BY MIS TEAM
-                    </footer>
+                    </footer> -->
                 </div>
             </div>
         </div>
